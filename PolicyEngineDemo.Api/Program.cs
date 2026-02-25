@@ -7,6 +7,14 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// 1. Adds the core Authentication services
+builder.Services.AddAuthentication();
+
+// 2. Adds the core Authorization services (this fixes your error!)
+builder.Services.AddAuthorization();
+
+builder.Services.AddControllers();
+
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();

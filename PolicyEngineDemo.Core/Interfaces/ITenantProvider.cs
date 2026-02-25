@@ -6,7 +6,7 @@ namespace PolicyEngineDemo.Core.Interfaces
 {
     public interface ITenantProvider
     {
-        string? GetTenantId();
-        string? GetUserId();
+        string? TenantId();
+        string? UserId();
     }
 }

@@ -22,7 +22,7 @@ public class AppDbContext : DbContext
 
         // --- GLOBAL QUERY FILTER ---
         // Every 'Select' query automatically adds: WHERE TenantId = 'CurrentTenantId'
-        modelBuilder.Entity<Policy>().HasQueryFilter(p => p.TenantId == _tenantProvider.GetTenantId());
+        modelBuilder.Entity<Policy>().HasQueryFilter(p => p.TenantId == _tenantProvider.TenantId());
 
         // TenantId is indexed for high-speed lookups in Azure SQL
         modelBuilder.Entity<Policy>().HasIndex(p => p.TenantId);
@@ -35,9 +35,9 @@ public class AppDbContext : DbContext
         {
             if (entry.State == EntityState.Added)
             {
-                entry.Entity.TenantId = _tenantProvider.GetTenantId() ?? "Unknown";
+                entry.Entity.TenantId = _tenantProvider.TenantId() ?? "Unknown";
                 entry.Entity.CreatedAt = DateTime.UtcNow;
-                entry.Entity.CreatedBy = _tenantProvider.GetUserId() ?? "System";
+                entry.Entity.CreatedBy = _tenantProvider.UserId() ?? "System";
             }
         }
         return base.SaveChangesAsync(ct);

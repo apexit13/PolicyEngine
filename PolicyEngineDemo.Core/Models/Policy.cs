@@ -11,7 +11,7 @@ public class Policy : IBaseEntity
     public string Description { get; set; } = string.Empty;
     public bool IsActive { get; set; } = true;
 
-    // Infrastructure Shadow Metadata
+    // Handled as Shadow Properties in EF Core
     public string TenantId { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
     public string CreatedBy { get; set; } = string.Empty;

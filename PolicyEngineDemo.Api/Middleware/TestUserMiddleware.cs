@@ -10,15 +10,25 @@ public class TestUserMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        // Look for a header called "X-Tenant" in the request
         var tenantHeader = context.Request.Headers["X-Tenant"].ToString();
 
         if (!string.IsNullOrEmpty(tenantHeader))
         {
+            // X-Role header lets you test both roles in Scalar:
+            //   X-Role: Policy.Admin   → full access
+            //   X-Role: Policy.Viewer  → read only
+            //   (omit)                 → defaults to Policy.Admin for convenience
+            var role = context.Request.Headers["X-Role"].ToString();
+            if (string.IsNullOrEmpty(role))
+                role = "Policy.Admin";
+
             var claims = new[]
             {
-                new Claim("tid", tenantHeader), // Our Tenant ID
-                new Claim(ClaimTypes.NameIdentifier, "test-user-123") // Our User ID
+                new Claim("tid", tenantHeader),
+                new Claim(ClaimTypes.NameIdentifier, "test-user-123"),
+
+                // Must match the namespace used in Program.cs authorization policies
+                new Claim("https://policyengine/roles", role)
             };
 
             var identity = new ClaimsIdentity(claims, "TestAuth");

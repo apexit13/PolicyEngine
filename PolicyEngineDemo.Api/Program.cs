@@ -1,3 +1,5 @@
+using Serilog;
+using Serilog.Events;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -8,7 +10,24 @@ using PolicyEngineDemo.Core.Interfaces;
 using Scalar.AspNetCore;
 using System.Security.Claims;
 
+// ── SERILOG ─────────────────────────────────────────────────────────────────
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
+    .Enrich.FromLogContext()
+    .WriteTo.Console(outputTemplate:
+        "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
+    .WriteTo.File(
+        path: "logs/audit-.json",
+        formatter: new Serilog.Formatting.Json.JsonFormatter(),
+        rollingInterval: RollingInterval.Day,
+        retainedFileCountLimit: 30,
+        fileSizeLimitBytes: 50_000_000)
+    .CreateLogger();
+
 var builder = WebApplication.CreateBuilder(args);
+builder.Host.UseSerilog();
 
 // ── AUTHENTICATION ──────────────────────────────────────────────────────────
 // Validates Auth0-issued JWTs on every request.
@@ -59,6 +78,7 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ITenantProvider, TenantProvider>();
+builder.Services.AddSingleton<Microsoft.IO.RecyclableMemoryStreamManager>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -71,7 +91,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 
-    // Mock middleware stays active in Development so we can still test
+    // Mock middleware stays active in Development so you can still test
     // locally via Scalar with the X-Tenant header — no Auth0 token needed.
     app.UseMiddleware<TestUserMiddleware>();
 
@@ -83,5 +103,6 @@ app.UseHttpsRedirection();
 app.UseCors("BlazorClient");
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<AuditMiddleware>();
 app.MapControllers();
 app.Run();

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PolicyEngineDemo.Api.DTOs;
 using PolicyEngineDemo.Core.Data;
 using PolicyEngineDemo.Core.Interfaces;
 using PolicyEngineDemo.Core.Models;
@@ -39,12 +40,19 @@ public class PolicyController : ControllerBase
     // GET: api/policy
     // Both Admins and Viewers can read policies for their tenant.
     // The global query filter in AppDbContext ensures only the caller's
-    // tenant data is returned — no extra filtering needed here.
+    // tenant data is returned. Admins see all their policies, but Viewers only see active ones.
     [HttpGet]
     [Authorize(Policy = "Policy.Viewer")]
     public async Task<ActionResult<IEnumerable<Policy>>> GetPolicies()
     {
-        return await _context.Policies.ToListAsync();
+        var isAdmin = User.HasClaim("https://policyengine/roles", "Policy.Admin");
+
+        var query = _context.Policies.AsQueryable();
+
+        if (!isAdmin)
+            query = query.Where(p => p.IsActive);
+
+        return await query.ToListAsync();
     }
 
     // GET: api/policy/{id}
@@ -146,5 +154,3 @@ public class PolicyController : ControllerBase
     }
 }
 
-// IsActive added so admins can set it on create/update
-public record PolicyDto(string Title, string Description, bool IsActive = true);

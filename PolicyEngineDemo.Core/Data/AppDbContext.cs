@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using PolicyEngineDemo.Core.Interfaces;
 using PolicyEngineDemo.Core.Models;
 
@@ -15,31 +15,36 @@ public class AppDbContext : DbContext
     }
 
     public DbSet<Policy> Policies => Set<Policy>();
+    public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
+        // Global query filter — every Policies query automatically scopes to
+        // the current tenant. Users physically cannot see other tenants' data.
+        modelBuilder.Entity<Policy>()
+            .HasQueryFilter(p => p.TenantId == _tenantProvider.TenantId());
 
-        // --- GLOBAL QUERY FILTER ---
-        // Every 'Select' query automatically adds: WHERE TenantId = 'CurrentTenantId'
-        modelBuilder.Entity<Policy>().HasQueryFilter(p => p.TenantId == _tenantProvider.TenantId());
-
-        // TenantId is indexed for high-speed lookups in Azure SQL
-        modelBuilder.Entity<Policy>().HasIndex(p => p.TenantId);
+        // AuditLogs: no global filter — admins querying audit logs can see all
+        // entries for their tenant via explicit Where() in the controller.
+        modelBuilder.Entity<AuditLog>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.ToTable("AuditLogs");
+        });
     }
 
-    public override Task<int> SaveChangesAsync(CancellationToken ct = default)
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        // --- AUTOMATIC INJECTION ---
-        foreach (var entry in ChangeTracker.Entries<IBaseEntity>())
+        // Auto-stamp TenantId, CreatedAt, CreatedBy on new Policy entities
+        foreach (var entry in ChangeTracker.Entries<Policy>()
+            .Where(e => e.State == EntityState.Added))
         {
-            if (entry.State == EntityState.Added)
-            {
-                entry.Entity.TenantId = _tenantProvider.TenantId() ?? "Unknown";
-                entry.Entity.CreatedAt = DateTime.UtcNow;
-                entry.Entity.CreatedBy = _tenantProvider.UserId() ?? "System";
-            }
+            entry.Entity.TenantId  = _tenantProvider.TenantId() ?? "";
+            entry.Entity.CreatedAt = DateTime.UtcNow;
+            entry.Entity.CreatedBy = _tenantProvider.UserId() ?? "";
         }
-        return base.SaveChangesAsync(ct);
+
+        return await base.SaveChangesAsync(cancellationToken);
     }
 }

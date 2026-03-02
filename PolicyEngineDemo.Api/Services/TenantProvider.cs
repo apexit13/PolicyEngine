@@ -5,7 +5,7 @@ namespace PolicyEngineDemo.Api.Services;
 
 public class TenantProvider : ITenantProvider
 {
-    private const string ClaimType = "tid";
+    private const string ClaimType = "http://schemas.microsoft.com/identity/claims/tenantid";
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     public TenantProvider(IHttpContextAccessor httpContextAccessor)

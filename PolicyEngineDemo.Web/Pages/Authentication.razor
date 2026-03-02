@@ -1,0 +1,16 @@
+@page "/authentication/{action}"
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+<RemoteAuthenticatorView Action="@Action">
+    <LoggingIn>
+        <MudContainer Class="d-flex justify-center mt-16">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+        </MudContainer>
+    </LoggingIn>
+</RemoteAuthenticatorView>
+
+@using MudBlazor
+
+@code {
+    [Parameter] public string? Action { get; set; }
+}

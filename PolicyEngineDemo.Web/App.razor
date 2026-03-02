@@ -1,0 +1,43 @@
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <NotAuthorized>
+                    @if (!context.User.Identity?.IsAuthenticated ?? true)
+                    {
+                        <RedirectToLogin />
+                    }
+                    else
+                    {
+                        <MudContainer Class="mt-8">
+                            <MudAlert Severity="Severity.Warning" Class="mt-4">
+                                You are not authorised to view this page.
+                                <MudLink Href="/">Return to policies</MudLink>
+                            </MudAlert>
+                        </MudContainer>
+                    }
+                </NotAuthorized>
+                <Authorizing>
+                    <MudContainer Class="d-flex justify-center mt-16">
+                        <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+                    </MudContainer>
+                </Authorizing>
+            </AuthorizeRouteView>
+        </Found>
+        <NotFound>
+            <PageTitle>Not found</PageTitle>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <MudContainer Class="mt-8">
+                    <MudAlert Severity="Severity.Error">
+                        Page not found. <MudLink Href="/">Go home</MudLink>
+                    </MudAlert>
+                </MudContainer>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>
+
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using MudBlazor
+@using PolicyEngineDemo.Web.Shared

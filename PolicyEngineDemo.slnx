@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="PolicyEngineDemo.Api/PolicyEngineDemo.Api.csproj" />
   <Project Path="PolicyEngineDemo.Core/PolicyEngineDemo.Core.csproj" />
+  <Project Path="PolicyEngineDemo.Web/PolicyEngineDemo.Web.csproj" />
 </Solution>

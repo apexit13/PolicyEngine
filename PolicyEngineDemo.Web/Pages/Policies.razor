@@ -1,0 +1,205 @@
+@page "/"
+@page "/policies"
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using MudBlazor
+@using PolicyEngineDemo.Web.Models
+@using PolicyEngineDemo.Web.Services
+@inject PolicyService PolicyService
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+@inject RoleService RoleService
+
+<PageTitle>Policies — PolicyEngineDemo</PageTitle>
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-4">
+    <MudText Typo="Typo.h5"><b>Policies</b></MudText>
+    <MudSpacer />
+    @if (_isAdmin)
+    {
+        <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.Add"
+                   Href="/policies/new">
+            New Policy
+        </MudButton>
+    }
+</MudStack>
+
+<MudPaper Class="pa-4 mb-4" Elevation="1">
+    <MudStack Row="true" Spacing="3" AlignItems="AlignItems.Center">
+        <MudTextField @bind-Value="_search"
+                      Label="Search"
+                      Placeholder="Search title or description…"
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      Variant="Variant.Outlined"
+                      Immediate="true"
+                      Class="flex-grow-1" />
+        <MudSelect T="string" @bind-Value="_statusFilter"
+                   Label="Status" Variant="Variant.Outlined" Style="min-width:140px">
+            <MudSelectItem Value="@("All")">All</MudSelectItem>
+            <MudSelectItem Value="@("Active")">Active</MudSelectItem>
+            <MudSelectItem Value="@("Inactive")">Inactive</MudSelectItem>
+        </MudSelect>
+    </MudStack>
+</MudPaper>
+
+@if (_loading)
+{
+    <MudProgressLinear Indeterminate="true" Color="Color.Primary" Class="mb-4" />
+}
+else if (_policies.Count == 0)
+{
+    <MudAlert Severity="Severity.Info">No policies found for your tenant.</MudAlert>
+}
+else
+{
+    <MudTable Items="@FilteredPolicies" Hover="true" Striped="true"
+              Elevation="2" Dense="false" T="Policy">
+        <HeaderContent>
+            <MudTh>Title</MudTh>
+            <MudTh>Description</MudTh>
+            <MudTh>Status</MudTh>
+            <MudTh>Created</MudTh>
+            @if (_isAdmin)
+            {
+                <MudTh>Actions</MudTh>
+            }
+        </HeaderContent>
+        <RowTemplate Context="policy">
+            <MudTd DataLabel="Title">
+                <MudText Typo="Typo.body1"><b>@policy.Title</b></MudText>
+            </MudTd>
+            <MudTd DataLabel="Description">
+                <MudText Typo="Typo.body2" Style="max-width:400px;white-space:normal">
+                    @policy.Description
+                </MudText>
+            </MudTd>
+            <MudTd DataLabel="Status">
+                @if (policy.IsActive)
+                {
+                    <MudChip T="string" Color="Color.Success" Size="Size.Small"
+                             Icon="@Icons.Material.Filled.CheckCircle">
+                        Active
+                    </MudChip>
+                }
+                else
+                {
+                    <MudChip T="string" Color="Color.Default" Size="Size.Small"
+                             Icon="@Icons.Material.Filled.Cancel">
+                        Inactive
+                    </MudChip>
+                }
+            </MudTd>
+            <MudTd DataLabel="Created">
+                <MudText Typo="Typo.caption">
+                    @policy.CreatedAt.ToString("dd MMM yyyy")
+                </MudText>
+            </MudTd>
+            @if (_isAdmin)
+            {
+                <MudTd DataLabel="Actions">
+                    <MudStack Row="true" Spacing="1">
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                       Color="Color.Primary" Size="Size.Small"
+                                       Href="@($"/policies/{policy.Id}/edit")"
+                                       Title="Edit" />
+                        <MudIconButton
+                            Icon="@(policy.IsActive
+                                ? Icons.Material.Filled.ToggleOff
+                                : Icons.Material.Filled.ToggleOn)"
+                            Color="@(policy.IsActive ? Color.Warning : Color.Success)"
+                            Size="Size.Small"
+                            OnClick="@(() => ToggleAsync(policy))"
+                            Title="@(policy.IsActive ? "Deactivate" : "Activate")" />
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                       Color="Color.Error" Size="Size.Small"
+                                       OnClick="@(() => DeleteAsync(policy))"
+                                       Title="Delete" />
+                    </MudStack>
+                </MudTd>
+            }
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    private List<Policy> _policies = [];
+    private bool _loading = true;
+    private bool _isAdmin = false;
+    private string _search = string.Empty;
+    private string _statusFilter = "All";
+
+    private IEnumerable<Policy> FilteredPolicies => _policies
+        .Where(p => string.IsNullOrEmpty(_search) ||
+                    p.Title.Contains(_search, StringComparison.OrdinalIgnoreCase) ||
+                    p.Description.Contains(_search, StringComparison.OrdinalIgnoreCase))
+        .Where(p => _statusFilter == "All" ||
+                    (_statusFilter == "Active" && p.IsActive) ||
+                    (_statusFilter == "Inactive" && !p.IsActive));
+
+    [CascadingParameter] private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthenticationStateTask is not null)
+        {
+            var authState = await AuthenticationStateTask;
+            if (authState.User.Identity?.IsAuthenticated == true)
+            {
+                _isAdmin = await RoleService.IsAdminAsync();
+                await LoadAsync();
+            }
+        }
+    }
+
+    private async Task LoadAsync()
+    {
+        _loading = true;
+        try
+        {
+            _policies = await PolicyService.GetPoliciesAsync();
+        }
+        catch
+        {
+            Snackbar.Add("Failed to load policies.", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private async Task ToggleAsync(Policy policy)
+    {
+        try
+        {
+            await PolicyService.ToggleActiveAsync(policy.Id);
+            policy.IsActive = !policy.IsActive;
+            var state = policy.IsActive ? "activated" : "deactivated";
+            Snackbar.Add($"Policy {state}.", Severity.Success);
+        }
+        catch
+        {
+            Snackbar.Add("Failed to update policy.", Severity.Error);
+        }
+    }
+
+    private async Task DeleteAsync(Policy policy)
+    {
+        try
+        {
+            await PolicyService.DeletePolicyAsync(policy.Id);
+            _policies.Remove(policy);
+            Snackbar.Add("Policy deleted.", Severity.Success);
+        }
+        catch
+        {
+            Snackbar.Add("Failed to delete policy.", Severity.Error);
+        }
+    }
+}

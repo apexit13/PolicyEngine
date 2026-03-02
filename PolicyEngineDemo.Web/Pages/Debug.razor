@@ -1,0 +1,77 @@
+@page "/debug"
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization
+@using MudBlazor
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<PageTitle>Debug</PageTitle>
+
+<MudText Typo="Typo.h5" Class="mb-4">API Debug</MudText>
+
+<MudButton Variant="Variant.Filled" Color="Color.Primary"
+           OnClick="CallDebug" Class="mb-4">
+    Call api/policy/debug
+</MudButton>
+
+<MudButton Variant="Variant.Outlined" Color="Color.Secondary"
+           OnClick="CallPolicies" Class="mb-4 ml-2">
+    Call api/policy
+</MudButton>
+
+@if (_loading)
+{
+    <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+}
+
+@if (!string.IsNullOrEmpty(_result))
+{
+    <MudPaper Class="pa-4" Elevation="2">
+        <pre style="white-space:pre-wrap;word-break:break-all;font-size:12px">@_result</pre>
+    </MudPaper>
+}
+
+@code {
+    private string _result = string.Empty;
+    private bool _loading = false;
+
+    private async Task CallDebug()
+    {
+        _loading = true;
+        _result = string.Empty;
+        try
+        {
+            var response = await Http.GetAsync("api/policy/debug");
+            _result = $"Status: {(int)response.StatusCode} {response.StatusCode}\n\n";
+            _result += await response.Content.ReadAsStringAsync();
+        }
+        catch (Exception ex)
+        {
+            _result = $"Exception: {ex.Message}";
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private async Task CallPolicies()
+    {
+        _loading = true;
+        _result = string.Empty;
+        try
+        {
+            var response = await Http.GetAsync("api/policy");
+            _result = $"Status: {(int)response.StatusCode} {response.StatusCode}\n\n";
+            _result += await response.Content.ReadAsStringAsync();
+        }
+        catch (Exception ex)
+        {
+            _result = $"Exception: {ex.Message}";
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+}

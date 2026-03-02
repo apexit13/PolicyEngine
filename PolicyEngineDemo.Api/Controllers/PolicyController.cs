@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PolicyEngineDemo.Core.Data;
+using PolicyEngineDemo.Core.Interfaces;
 using PolicyEngineDemo.Core.Models;
 
 namespace PolicyEngine.Api.Controllers;
@@ -16,6 +17,23 @@ public class PolicyController : ControllerBase
     public PolicyController(AppDbContext context)
     {
         _context = context;
+    }
+
+    // GET: api/policy/debug
+    [HttpGet("debug")]
+    [AllowAnonymous]
+    public IActionResult Debug()
+    {
+        var claims = User.Claims.Select(c => new { c.Type, c.Value });
+        return Ok(new
+        {
+            isAuthenticated = User.Identity?.IsAuthenticated,
+            tenantFromProvider = HttpContext.RequestServices
+                .GetRequiredService<ITenantProvider>().TenantId(),
+            userIdFromProvider = HttpContext.RequestServices
+                .GetRequiredService<ITenantProvider>().UserId(),
+            claims
+        });
     }
 
     // GET: api/policy

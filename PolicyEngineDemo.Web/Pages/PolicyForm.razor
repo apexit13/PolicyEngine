@@ -1,0 +1,141 @@
+@page "/policies/new"
+@page "/policies/{Id:guid}/edit"
+@using MudBlazor
+@using PolicyEngineDemo.Web.Models
+@using PolicyEngineDemo.Web.Services
+@inject PolicyService PolicyService
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+@inject RoleService RoleService
+
+<PageTitle>@(_isNew ? "New Policy" : "Edit Policy") — PolicyEngineDemo</PageTitle>
+
+<MudBreadcrumbs Items="_breadcrumbs" Class="mb-2 px-0" />
+
+<MudText Typo="Typo.h5" Class="mb-4">
+    <b>@(_isNew ? "New Policy" : "Edit Policy")</b>
+</MudText>
+
+@if (_loading)
+{
+    <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+}
+else
+{
+    <MudPaper Class="pa-6" MaxWidth="700px" Elevation="2">
+        <MudForm @ref="_form" @bind-IsValid="_isValid">
+
+            <MudTextField @bind-Value="_dto.Title"
+                          Label="Title"
+                          Variant="Variant.Outlined"
+                          Required="true"
+                          RequiredError="Title is required"
+                          Class="mb-4" />
+
+            <MudTextField @bind-Value="_dto.Description"
+                          Label="Description"
+                          Variant="Variant.Outlined"
+                          Lines="4"
+                          Required="true"
+                          RequiredError="Description is required"
+                          Class="mb-4" />
+
+            <MudSwitch @bind-Value="_dto.IsActive"
+                       Color="Color.Success"
+                       Label="@(_dto.IsActive ? "Active" : "Inactive")"
+                       Class="mb-6" />
+
+            <MudStack Row="true" Spacing="2">
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Save"
+                           OnClick="SubmitAsync"
+                           Disabled="@(!_isValid || _saving)">
+                    @(_saving ? "Saving…" : "Save Policy")
+                </MudButton>
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Default"
+                           Href="/policies">
+                    Cancel
+                </MudButton>
+            </MudStack>
+
+        </MudForm>
+    </MudPaper>
+}
+
+@code {
+    [Parameter] public Guid? Id { get; set; }
+
+    private bool _isNew => Id is null;
+    private bool _loading = true;
+    private bool _saving = false;
+    private bool _isValid = false;
+    private PolicyDto _dto = new();
+    private MudForm _form = default!;
+
+    private List<BreadcrumbItem> _breadcrumbs =>
+    [
+        new("Policies", href: "/policies"),
+        new(_isNew ? "New" : "Edit", href: null, disabled: true)
+    ];
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Guard: only admins can access this page
+        if (!await RoleService.IsAdminAsync())
+        {
+            Navigation.NavigateTo("/policies");
+            return;
+        }
+
+        if (!_isNew && Id.HasValue)
+        {
+            try
+            {
+                var policy = await PolicyService.GetPolicyAsync(Id.Value);
+                if (policy is not null)
+                {
+                    _dto = new PolicyDto
+                    {
+                        Title = policy.Title,
+                        Description = policy.Description,
+                        IsActive = policy.IsActive
+                    };
+                }
+            }
+            catch
+            {
+                Snackbar.Add("Failed to load policy.", Severity.Error);
+                Navigation.NavigateTo("/policies");
+            }
+        }
+        _loading = false;
+    }
+
+    private async Task SubmitAsync()
+    {
+        await _form.Validate();
+        if (!_isValid) return;
+
+        _saving = true;
+        try
+        {
+            if (_isNew)
+                await PolicyService.CreatePolicyAsync(_dto);
+            else
+                await PolicyService.UpdatePolicyAsync(Id!.Value, _dto);
+
+            Snackbar.Add($"Policy {(_isNew ? "created" : "updated")} successfully.", Severity.Success);
+            Navigation.NavigateTo("/policies");
+        }
+        catch
+        {
+            Snackbar.Add("Failed to save policy.", Severity.Error);
+        }
+        finally
+        {
+            _saving = false;
+        }
+    }
+}

@@ -1,0 +1,28 @@
+@using MudBlazor
+@using Microsoft.AspNetCore.Components.Authorization
+@using PolicyEngineDemo.Web.Services
+@inject RoleService RoleService
+
+<MudNavMenu>
+    <MudNavLink Href="/" Match="NavLinkMatch.All"
+                Icon="@Icons.Material.Filled.Policy">
+        Policies
+    </MudNavLink>
+
+    @if (_isAdmin)
+    {
+        <MudNavLink Href="/policies/new"
+                    Icon="@Icons.Material.Filled.AddCircle">
+            New Policy
+        </MudNavLink>
+    }
+</MudNavMenu>
+
+@code {
+    private bool _isAdmin = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _isAdmin = await RoleService.IsAdminAsync();
+    }
+}

@@ -5,8 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using PolicyEngineDemo.Api.Middleware;
 using PolicyEngineDemo.Api.Services;
-using PolicyEngineDemo.Core.Data;
-using PolicyEngineDemo.Core.Interfaces;
+using PolicyEngineDemo.Contracts.Data;
+using PolicyEngineDemo.Contracts.Interfaces;
 using Scalar.AspNetCore;
 using System.Security.Claims;
 

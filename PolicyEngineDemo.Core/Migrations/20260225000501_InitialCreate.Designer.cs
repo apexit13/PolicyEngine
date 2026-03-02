@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using PolicyEngineDemo.Core.Data;
+using PolicyEngineDemo.Contracts.Data;
 
 #nullable disable
 
-namespace PolicyEngineDemo.Core.Migrations
+namespace PolicyEngineDemo.Contracts.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     [Migration("20260225000501_InitialCreate")]

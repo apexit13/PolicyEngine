@@ -4,7 +4,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using MudBlazor
-@using PolicyEngineDemo.Web.Models
+@using PolicyEngineDemo.Contracts.Responses
 @using PolicyEngineDemo.Web.Services
 @inject PolicyService PolicyService
 @inject NavigationManager Navigation
@@ -36,12 +36,15 @@
                       Variant="Variant.Outlined"
                       Immediate="true"
                       Class="flex-grow-1" />
-        <MudSelect T="string" @bind-Value="_statusFilter"
-                   Label="Status" Variant="Variant.Outlined" Style="min-width:140px">
-            <MudSelectItem Value="@("All")">All</MudSelectItem>
-            <MudSelectItem Value="@("Active")">Active</MudSelectItem>
-            <MudSelectItem Value="@("Inactive")">Inactive</MudSelectItem>
-        </MudSelect>
+        @if (_isAdmin)
+        {
+            <MudSelect T="string" @bind-Value="_statusFilter"
+            Label="Status" Variant="Variant.Outlined" Style="min-width:140px">
+                <MudSelectItem Value="@("All")">All</MudSelectItem>
+                <MudSelectItem Value="@("Active")">Active</MudSelectItem>
+                <MudSelectItem Value="@("Inactive")">Inactive</MudSelectItem>
+            </MudSelect>
+        }
     </MudStack>
 </MudPaper>
 
@@ -56,11 +59,14 @@ else if (_policies.Count == 0)
 else
 {
     <MudTable Items="@FilteredPolicies" Hover="true" Striped="true"
-              Elevation="2" Dense="false" T="Policy">
+              Elevation="2" Dense="false" T="PolicyResponse">
         <HeaderContent>
             <MudTh>Title</MudTh>
             <MudTh>Description</MudTh>
-            <MudTh>Status</MudTh>
+            @if (_isAdmin)
+            {
+                <MudTh>Status</MudTh>
+            }
             <MudTh>Created</MudTh>
             @if (_isAdmin)
             {
@@ -76,22 +82,25 @@ else
                     @policy.Description
                 </MudText>
             </MudTd>
-            <MudTd DataLabel="Status">
-                @if (policy.IsActive)
-                {
-                    <MudChip T="string" Color="Color.Success" Size="Size.Small"
-                             Icon="@Icons.Material.Filled.CheckCircle">
-                        Active
-                    </MudChip>
-                }
-                else
-                {
-                    <MudChip T="string" Color="Color.Default" Size="Size.Small"
-                             Icon="@Icons.Material.Filled.Cancel">
-                        Inactive
-                    </MudChip>
-                }
-            </MudTd>
+            @if (_isAdmin)
+            {
+                <MudTd DataLabel="Status">
+                    @if (policy.IsActive)
+                    {
+                        <MudChip T="string" Color="Color.Success" Size="Size.Small"
+                        Icon="@Icons.Material.Filled.CheckCircle">
+                            Active
+                        </MudChip>
+                    }
+                    else
+                    {
+                        <MudChip T="string" Color="Color.Default" Size="Size.Small"
+                        Icon="@Icons.Material.Filled.Cancel">
+                            Inactive
+                        </MudChip>
+                    }
+                </MudTd>
+            }
             <MudTd DataLabel="Created">
                 <MudText Typo="Typo.caption">
                     @policy.CreatedAt.ToString("dd MMM yyyy")
@@ -128,13 +137,13 @@ else
 }
 
 @code {
-    private List<Policy> _policies = [];
+    private List<PolicyResponse> _policies = [];
     private bool _loading = true;
     private bool _isAdmin = false;
     private string _search = string.Empty;
     private string _statusFilter = "All";
 
-    private IEnumerable<Policy> FilteredPolicies => _policies
+    private IEnumerable<PolicyResponse> FilteredPolicies => _policies
         .Where(p => string.IsNullOrEmpty(_search) ||
                     p.Title.Contains(_search, StringComparison.OrdinalIgnoreCase) ||
                     p.Description.Contains(_search, StringComparison.OrdinalIgnoreCase))
@@ -174,7 +183,7 @@ else
         }
     }
 
-    private async Task ToggleAsync(Policy policy)
+    private async Task ToggleAsync(PolicyResponse policy)
     {
         try
         {
@@ -189,7 +198,7 @@ else
         }
     }
 
-    private async Task DeleteAsync(Policy policy)
+    private async Task DeleteAsync(PolicyResponse policy)
     {
         try
         {

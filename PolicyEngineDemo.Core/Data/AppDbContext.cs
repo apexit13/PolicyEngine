@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using PolicyEngineDemo.Core.Interfaces;
-using PolicyEngineDemo.Core.Models;
+using PolicyEngineDemo.Contracts.Interfaces;
+using PolicyEngineDemo.Contracts.Models;
 
-namespace PolicyEngineDemo.Core.Data;
+namespace PolicyEngineDemo.Contracts.Data;
 
 public class AppDbContext : DbContext
 {

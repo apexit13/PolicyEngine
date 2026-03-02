@@ -1,16 +1,17 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using PolicyEngineDemo.Api.DTOs;
-using PolicyEngineDemo.Core.Data;
-using PolicyEngineDemo.Core.Interfaces;
-using PolicyEngineDemo.Core.Models;
+using PolicyEngineDemo.Contracts.Constants;
+using PolicyEngineDemo.Contracts.Data;
+using PolicyEngineDemo.Contracts.Models;
+using PolicyEngineDemo.Contracts.Requests;
+using PolicyEngineDemo.Contracts.Responses;
 
 namespace PolicyEngine.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize] // All endpoints require a valid Entra ID token minimum
+[Authorize]
 public class PolicyController : ControllerBase
 {
     private readonly AppDbContext _context;
@@ -20,90 +21,74 @@ public class PolicyController : ControllerBase
         _context = context;
     }
 
-    // GET: api/policy/debug
-    [HttpGet("debug")]
-    [AllowAnonymous]
-    public IActionResult Debug()
-    {
-        var claims = User.Claims.Select(c => new { c.Type, c.Value });
-        return Ok(new
-        {
-            isAuthenticated = User.Identity?.IsAuthenticated,
-            tenantFromProvider = HttpContext.RequestServices
-                .GetRequiredService<ITenantProvider>().TenantId(),
-            userIdFromProvider = HttpContext.RequestServices
-                .GetRequiredService<ITenantProvider>().UserId(),
-            claims
-        });
-    }
-
     // GET: api/policy
-    // Both Admins and Viewers can read policies for their tenant.
-    // The global query filter in AppDbContext ensures only the caller's
-    // tenant data is returned. Admins see all their policies, but Viewers only see active ones.
     [HttpGet]
     [Authorize(Policy = "Policy.Viewer")]
-    public async Task<ActionResult<IEnumerable<Policy>>> GetPolicies()
+    public async Task<ActionResult<IEnumerable<PolicyResponse>>> GetPolicies()
     {
-        var isAdmin = User.HasClaim("https://policyengine/roles", "Policy.Admin");
+        var isAdmin = User.HasClaim(ClaimNames.Roles, "Policy.Admin");
 
         var query = _context.Policies.AsQueryable();
 
         if (!isAdmin)
             query = query.Where(p => p.IsActive);
 
-        return await query.ToListAsync();
+        var policies = await query.ToListAsync();
+
+        return Ok(policies.Select(MapToResponse));
     }
 
     // GET: api/policy/{id}
     [HttpGet("{id}")]
     [Authorize(Policy = "Policy.Viewer")]
-    public async Task<ActionResult<Policy>> GetPolicy(Guid id)
+    public async Task<ActionResult<PolicyResponse>> GetPolicy(Guid id)
     {
-        var policy = await _context.Policies.SingleOrDefaultAsync(p => p.Id == id);
-        if (policy == null)
+        var policy = await _context.Policies
+            .SingleOrDefaultAsync(p => p.Id == id);
+
+        if (policy is null)
             return NotFound();
 
-        return Ok(policy);
+        return Ok(MapToResponse(policy));
     }
 
     // POST: api/policy
-    // Admin only — create a new policy.
     [HttpPost]
     [Authorize(Policy = "Policy.Admin")]
-    public async Task<ActionResult<Policy>> CreatePolicy(PolicyDto input)
+    public async Task<ActionResult<PolicyResponse>> CreatePolicy(
+        CreatePolicyRequest request)
     {
         var policy = new Policy
         {
-            Title = input.Title,
-            Description = input.Description,
-            IsActive = input.IsActive
+            Title = request.Title,
+            Description = request.Description,
+            IsActive = request.IsActive
         };
 
         _context.Policies.Add(policy);
-
-        // SaveChangesAsync automatically injects TenantId, CreatedAt, CreatedBy
-        // from the validated JWT claims via TenantProvider.
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(GetPolicy), new { id = policy.Id }, policy);
+        return CreatedAtAction(
+            nameof(GetPolicy),
+            new { id = policy.Id },
+            MapToResponse(policy));
     }
 
     // PUT: api/policy/{id}
-    // Admin only — full update.
     [HttpPut("{id}")]
     [Authorize(Policy = "Policy.Admin")]
-    public async Task<IActionResult> UpdatePolicy(Guid id, PolicyDto input)
+    public async Task<ActionResult<PolicyResponse>> UpdatePolicy(
+        Guid id, UpdatePolicyRequest request)
     {
-        // SingleOrDefaultAsync (not FindAsync) so the global tenant query filter
-        // is applied — users cannot update policies owned by other tenants.
-        var policy = await _context.Policies.SingleOrDefaultAsync(p => p.Id == id);
-        if (policy == null)
+        var policy = await _context.Policies
+            .SingleOrDefaultAsync(p => p.Id == id);
+
+        if (policy is null)
             return NotFound();
 
-        policy.Title = input.Title;
-        policy.Description = input.Description;
-        policy.IsActive = input.IsActive;
+        policy.Title = request.Title;
+        policy.Description = request.Description;
+        policy.IsActive = request.IsActive;
 
         try
         {
@@ -116,18 +101,18 @@ public class PolicyController : ControllerBase
             throw;
         }
 
-        return Ok(policy);
+        return Ok(MapToResponse(policy));
     }
 
     // PATCH: api/policy/{id}/toggle
-    // Admin only — toggle the IsActive flag without sending the full policy body.
-    // This is what the Blazor UI's Activate/Deactivate button calls.
     [HttpPatch("{id}/toggle")]
     [Authorize(Policy = "Policy.Admin")]
     public async Task<IActionResult> ToggleActive(Guid id)
     {
-        var policy = await _context.Policies.SingleOrDefaultAsync(p => p.Id == id);
-        if (policy == null)
+        var policy = await _context.Policies
+            .SingleOrDefaultAsync(p => p.Id == id);
+
+        if (policy is null)
             return NotFound();
 
         policy.IsActive = !policy.IsActive;
@@ -137,14 +122,14 @@ public class PolicyController : ControllerBase
     }
 
     // DELETE: api/policy/{id}
-    // Admin only.
     [HttpDelete("{id}")]
     [Authorize(Policy = "Policy.Admin")]
     public async Task<IActionResult> DeletePolicy(Guid id)
     {
-        // SingleOrDefaultAsync so the global tenant filter prevents cross-tenant deletes.
-        var policy = await _context.Policies.SingleOrDefaultAsync(p => p.Id == id);
-        if (policy == null)
+        var policy = await _context.Policies
+            .SingleOrDefaultAsync(p => p.Id == id);
+
+        if (policy is null)
             return NotFound();
 
         _context.Policies.Remove(policy);
@@ -152,5 +137,16 @@ public class PolicyController : ControllerBase
 
         return NoContent();
     }
-}
 
+    // ── Private mapping ──────────────────────────────────────────────────────
+    private static PolicyResponse MapToResponse(Policy p) => new()
+    {
+        Id = p.Id,
+        Title = p.Title,
+        Description = p.Description,
+        IsActive = p.IsActive,
+        TenantId = p.TenantId,
+        CreatedAt = p.CreatedAt,
+        CreatedBy = p.CreatedBy
+    };
+}

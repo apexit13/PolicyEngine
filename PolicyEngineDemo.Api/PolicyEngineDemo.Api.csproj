@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PolicyEngineDemo.Core\PolicyEngineDemo.Core.csproj" />
+    <ProjectReference Include="..\PolicyEngineDemo.Contracts\PolicyEngineDemo.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

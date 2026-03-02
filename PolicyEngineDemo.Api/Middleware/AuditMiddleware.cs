@@ -1,6 +1,6 @@
 using Microsoft.IO;
-using PolicyEngineDemo.Core.Data;
-using PolicyEngineDemo.Core.Models;
+using PolicyEngineDemo.Contracts.Data;
+using PolicyEngineDemo.Contracts.Models;
 using System.Diagnostics;
 
 namespace PolicyEngineDemo.Api.Middleware;

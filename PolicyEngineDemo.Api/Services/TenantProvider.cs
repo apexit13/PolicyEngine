@@ -1,5 +1,5 @@
 ﻿using System.Security.Claims;
-using PolicyEngineDemo.Core.Interfaces;
+using PolicyEngineDemo.Contracts.Interfaces;
 
 namespace PolicyEngineDemo.Api.Services;
 

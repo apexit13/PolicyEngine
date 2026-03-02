@@ -1,6 +1,6 @@
-﻿using PolicyEngineDemo.Core.Interfaces;
+﻿using PolicyEngineDemo.Contracts.Interfaces;
 
-namespace PolicyEngineDemo.Core.Models;
+namespace PolicyEngineDemo.Contracts.Models;
 
 public class Policy : IBaseEntity
 {

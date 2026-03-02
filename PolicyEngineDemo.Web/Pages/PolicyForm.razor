@@ -1,7 +1,8 @@
 @page "/policies/new"
 @page "/policies/{Id:guid}/edit"
 @using MudBlazor
-@using PolicyEngineDemo.Web.Models
+@using PolicyEngineDemo.Contracts.Requests
+@using PolicyEngineDemo.Contracts.Responses
 @using PolicyEngineDemo.Web.Services
 @inject PolicyService PolicyService
 @inject NavigationManager Navigation
@@ -25,24 +26,24 @@ else
     <MudPaper Class="pa-6" MaxWidth="700px" Elevation="2">
         <MudForm @ref="_form" @bind-IsValid="_isValid">
 
-            <MudTextField @bind-Value="_dto.Title"
+            <MudTextField @bind-Value="_request.Title"
                           Label="Title"
                           Variant="Variant.Outlined"
                           Required="true"
                           RequiredError="Title is required"
                           Class="mb-4" />
 
-            <MudTextField @bind-Value="_dto.Description"
+            <MudTextField @bind-Value="_request.Description"
                           Label="Description"
                           Variant="Variant.Outlined"
-                          Lines="4"
+                          Lines="8"
                           Required="true"
                           RequiredError="Description is required"
                           Class="mb-4" />
 
-            <MudSwitch @bind-Value="_dto.IsActive"
+            <MudSwitch @bind-Value="_request.IsActive"
                        Color="Color.Success"
-                       Label="@(_dto.IsActive ? "Active" : "Inactive")"
+                       Label="@(_request.IsActive ? "Active" : "Inactive")"
                        Class="mb-6" />
 
             <MudStack Row="true" Spacing="2">
@@ -71,8 +72,17 @@ else
     private bool _loading = true;
     private bool _saving = false;
     private bool _isValid = false;
-    private PolicyDto _dto = new();
     private MudForm _form = default!;
+
+    // For create we use CreatePolicyRequest, for edit UpdatePolicyRequest.
+    // Both have the same fields so we hold the shared values in a simple
+    // backing object and construct the correct request type on submit.
+    private string _title = "";
+    private string _description = "";
+    private bool _isActive = true;
+
+    // Convenience wrapper so the form fields bind to a single object
+    private CreatePolicyRequest _request = new();
 
     private List<BreadcrumbItem> _breadcrumbs =>
     [
@@ -82,7 +92,6 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        // Guard: only admins can access this page
         if (!await RoleService.IsAdminAsync())
         {
             Navigation.NavigateTo("/policies");
@@ -96,11 +105,12 @@ else
                 var policy = await PolicyService.GetPolicyAsync(Id.Value);
                 if (policy is not null)
                 {
-                    _dto = new PolicyDto
+                    // Populate the form from the PolicyResponse
+                    _request = new CreatePolicyRequest
                     {
-                        Title = policy.Title,
+                        Title       = policy.Title,
                         Description = policy.Description,
-                        IsActive = policy.IsActive
+                        IsActive    = policy.IsActive
                     };
                 }
             }
@@ -110,6 +120,7 @@ else
                 Navigation.NavigateTo("/policies");
             }
         }
+
         _loading = false;
     }
 
@@ -122,9 +133,18 @@ else
         try
         {
             if (_isNew)
-                await PolicyService.CreatePolicyAsync(_dto);
+            {
+                await PolicyService.CreatePolicyAsync(_request);
+            }
             else
-                await PolicyService.UpdatePolicyAsync(Id!.Value, _dto);
+            {
+                await PolicyService.UpdatePolicyAsync(Id!.Value, new UpdatePolicyRequest
+                {
+                    Title       = _request.Title,
+                    Description = _request.Description,
+                    IsActive    = _request.IsActive
+                });
+            }
 
             Snackbar.Add($"Policy {(_isNew ? "created" : "updated")} successfully.", Severity.Success);
             Navigation.NavigateTo("/policies");

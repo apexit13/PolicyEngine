@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
-using PolicyEngineDemo.Web.Models;
+using PolicyEngineDemo.Contracts.Requests;
+using PolicyEngineDemo.Contracts.Responses;
 
 namespace PolicyEngineDemo.Web.Services;
 
@@ -17,29 +18,29 @@ public class PolicyService
         _http = http;
     }
 
-    public async Task<List<Policy>> GetPoliciesAsync()
+    public async Task<List<PolicyResponse>> GetPoliciesAsync()
     {
-        return await _http.GetFromJsonAsync<List<Policy>>("api/policy")
+        return await _http.GetFromJsonAsync<List<PolicyResponse>>("api/policy")
                ?? [];
     }
 
-    public async Task<Policy?> GetPolicyAsync(Guid id)
+    public async Task<PolicyResponse?> GetPolicyAsync(Guid id)
     {
-        return await _http.GetFromJsonAsync<Policy>($"api/policy/{id}");
+        return await _http.GetFromJsonAsync<PolicyResponse>($"api/policy/{id}");
     }
 
-    public async Task<Policy?> CreatePolicyAsync(PolicyDto dto)
+    public async Task<PolicyResponse?> CreatePolicyAsync(CreatePolicyRequest request)
     {
-        var response = await _http.PostAsJsonAsync("api/policy", dto);
+        var response = await _http.PostAsJsonAsync("api/policy", request);
         response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<Policy>();
+        return await response.Content.ReadFromJsonAsync<PolicyResponse>();
     }
 
-    public async Task<Policy?> UpdatePolicyAsync(Guid id, PolicyDto dto)
+    public async Task<PolicyResponse?> UpdatePolicyAsync(Guid id, UpdatePolicyRequest request)
     {
-        var response = await _http.PutAsJsonAsync($"api/policy/{id}", dto);
+        var response = await _http.PutAsJsonAsync($"api/policy/{id}", request);
         response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<Policy>();
+        return await response.Content.ReadFromJsonAsync<PolicyResponse>();
     }
 
     public async Task ToggleActiveAsync(Guid id)

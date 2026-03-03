@@ -149,7 +149,8 @@ else
                     p.Description.Contains(_search, StringComparison.OrdinalIgnoreCase))
         .Where(p => _statusFilter == "All" ||
                     (_statusFilter == "Active" && p.IsActive) ||
-                    (_statusFilter == "Inactive" && !p.IsActive));
+                    (_statusFilter == "Inactive" && !p.IsActive))
+        .OrderBy(p => p.Title);
 
     [CascadingParameter] private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
 

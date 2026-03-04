@@ -32,7 +32,7 @@ builder.Host.UseSerilog();
 // ── AUTHENTICATION ──────────────────────────────────────────────────────────
 // Validates Auth0-issued JWTs on every request.
 // Auth0 signs tokens with RS256 — the public key is fetched automatically
-// from the Auth0 JWKS endpoint (no secret needed in this project).
+// from the Auth0 JWKS endpoint (no secret needed).
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {

@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'PolicyEngine.Blazor/**'
+      - 'PolicyEngineDemo.Web/**'
 
 jobs:
   build-and-deploy:
@@ -22,15 +22,15 @@ jobs:
 
       - name: Restore dependencies
         run: dotnet restore
-        working-directory: PolicyEngine.Blazor
+        working-directory: PolicyEngineDemo.Web
 
       - name: Build
         run: dotnet build --configuration Release --no-restore
-        working-directory: PolicyEngine.Blazor
+        working-directory: PolicyEngineDemo.Web
 
       - name: Publish
         run: dotnet publish --configuration Release --no-build --output ./publish
-        working-directory: PolicyEngine.Blazor
+        working-directory: PolicyEngineDemo.Web
 
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
@@ -38,5 +38,5 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: upload
-          app_location: PolicyEngine.Blazor/publish/wwwroot
+          app_location: PolicyEngineDemo.Web/publish/wwwroot
           skip_app_build: true

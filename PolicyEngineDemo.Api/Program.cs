@@ -40,7 +40,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         // discovery document from here to validate tokens automatically.
         options.Authority = $"https://{builder.Configuration["Auth0:Domain"]}/";
 
-        // Audience must match the Identifier you set when registering the API in Auth0.
+        // Audience must match the Identifier set when registering the API in Auth0.
         options.Audience = builder.Configuration["Auth0:Audience"];
 
         options.TokenValidationParameters = new TokenValidationParameters

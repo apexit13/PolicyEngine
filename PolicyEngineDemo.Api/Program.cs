@@ -96,10 +96,12 @@ if (app.Environment.IsDevelopment())
     app.UseMiddleware<TestUserMiddleware>();
 
     app.MapOpenApi();
-    app.MapScalarApiReference();
+
+    // Azure App Service handles HTTPS termination itself so only needed in Development
+    app.UseHttpsRedirection();
 }
 
-app.UseHttpsRedirection();
+app.MapScalarApiReference();
 app.UseCors("BlazorClient");
 app.UseAuthentication();
 app.UseAuthorization();

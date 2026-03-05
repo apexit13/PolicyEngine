@@ -30,8 +30,11 @@ jobs:
         working-directory: PolicyEngineDemo.Web
 
       - name: Publish
-        run: dotnet publish --configuration Release --no-build --output ./publish
+        run: dotnet publish --configuration Release --output ./publish
         working-directory: PolicyEngineDemo.Web
+        
+      - name: Debug index.html
+        run: cat PolicyEngineDemo.Web/publish/wwwroot/index.html
 
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1

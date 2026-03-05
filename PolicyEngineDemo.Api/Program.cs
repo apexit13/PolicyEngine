@@ -95,12 +95,11 @@ if (app.Environment.IsDevelopment())
     // locally via Scalar with the X-Tenant header — no Auth0 token needed.
     app.UseMiddleware<TestUserMiddleware>();
 
-    app.MapOpenApi();
-
     // Azure App Service handles HTTPS termination itself so only needed in Development
     app.UseHttpsRedirection();
 }
 
+app.MapOpenApi();
 app.MapScalarApiReference();
 app.UseCors("BlazorClient");
 app.UseAuthentication();

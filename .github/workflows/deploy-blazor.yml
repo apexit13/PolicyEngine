@@ -34,7 +34,7 @@ jobs:
         working-directory: PolicyEngineDemo.Web
 
       - name: Debug publish output
-        run: find PolicyEngineDemo.Web/publish -type f | head -30
+        run: find PolicyEngineDemo.Web/publish/wwwroot/_framework -name "dotnet*" | head -10
 
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1

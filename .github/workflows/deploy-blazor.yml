@@ -33,6 +33,9 @@ jobs:
         run: dotnet publish --configuration Release --no-build --output ./publish
         working-directory: PolicyEngineDemo.Web
 
+      - name: Debug publish output
+        run: find PolicyEngineDemo.Web/publish -type f | head -30
+
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
         with:

@@ -2,7 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-	<WriteImportMapToHtml>true</WriteImportMapToHtml>
+    <!-- Enables the placeholder replacement for #[.{fingerprint}] -->
+    <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+    <!-- Ensures the import map for .NET runtime assets is injected -->
+    <WriteImportMapToHtml>true</WriteImportMapToHtml>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>

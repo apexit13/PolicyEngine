@@ -74,13 +74,6 @@ else
     private bool _isValid = false;
     private MudForm _form = default!;
 
-    // For create we use CreatePolicyRequest, for edit UpdatePolicyRequest.
-    // Both have the same fields so we hold the shared values in a simple
-    // backing object and construct the correct request type on submit.
-    private string _title = "";
-    private string _description = "";
-    private bool _isActive = true;
-
     // Convenience wrapper so the form fields bind to a single object
     private CreatePolicyRequest _request = new();
 

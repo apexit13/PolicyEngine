@@ -110,22 +110,25 @@ else
             {
                 <MudTd DataLabel="Actions">
                     <MudStack Row="true" Spacing="1">
-                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
-                                       Color="Color.Primary" Size="Size.Small"
-                                       Href="@($"/policies/{policy.Id}/edit")"
-                                       Title="Edit" />
-                        <MudIconButton
-                            Icon="@(policy.IsActive
-                                ? Icons.Material.Filled.ToggleOff
-                                : Icons.Material.Filled.ToggleOn)"
-                            Color="@(policy.IsActive ? Color.Warning : Color.Success)"
-                            Size="Size.Small"
-                            OnClick="@(() => ToggleAsync(policy))"
-                            Title="@(policy.IsActive ? "Deactivate" : "Activate")" />
-                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
-                                       Color="Color.Error" Size="Size.Small"
-                                       OnClick="@(() => DeleteAsync(policy))"
-                                       Title="Delete" />
+                        <MudTooltip Text="Edit">
+                            <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                    Color="Color.Primary" Size="Size.Small"
+                                    Href="@($"/policies/{policy.Id}/edit")"/>
+                        </MudTooltip>
+                        <MudTooltip Text="@(policy.IsActive ? "Deactivate" : "Activate" )">
+                            <MudIconButton
+                                    Icon="@(policy.IsActive
+                                        ? Icons.Material.Filled.ToggleOff
+                                        : Icons.Material.Filled.ToggleOn)"
+                                    Color="@(policy.IsActive ? Color.Warning : Color.Success)"
+                                    Size="Size.Small"
+                                    OnClick="@(() => ToggleAsync(policy))"/>
+                        </MudTooltip>
+                        <MudTooltip Text="Delete">
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                    Color="Color.Error" Size="Size.Small"
+                                    OnClick="@(() => DeleteAsync(policy))"/>
+                        </MudTooltip>
                     </MudStack>
                 </MudTd>
             }

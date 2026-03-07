@@ -17,8 +17,12 @@ builder.Services.AddOidcAuthentication(options =>
 
     options.ProviderOptions.ClientId = builder.Configuration["Auth0:ClientId"];
 
-    options.ProviderOptions.AdditionalProviderParameters
-        .Add("audience", builder.Configuration["Auth0:Audience"]);
+    var audience = builder.Configuration["Auth0:Audience"];
+    if (!string.IsNullOrWhiteSpace(audience))
+    {
+        options.ProviderOptions.AdditionalProviderParameters
+            .Add("audience", audience);
+    }
 
     options.ProviderOptions.ResponseType = "code";
 

@@ -76,10 +76,10 @@ builder.Services.AddCors(options =>
     });
 });
 
-if (!builder.Environment.IsDevelopment())
-{
-    builder.Services.AddApplicationInsightsTelemetry();
-}
+//if (!builder.Environment.IsDevelopment())
+//{
+//    builder.Services.AddApplicationInsightsTelemetry();
+//}
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();

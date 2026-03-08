@@ -61,7 +61,8 @@ builder.Services.AddAuthorization(options =>
         policy.RequireClaim("https://policyengine/roles", "Policy.Viewer", "Policy.Admin"));
 });
 
-// ── CORS ────────────────────────────────────────────────────────────────────
+// CORS is just implemented for local dev.
+// For production, Azure configures CORS in front of the API and only allows the Blazor client origin.
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("BlazorClient", policy =>
@@ -76,10 +77,10 @@ builder.Services.AddCors(options =>
     });
 });
 
-//if (!builder.Environment.IsDevelopment())
-//{
-//    builder.Services.AddApplicationInsightsTelemetry();
-//}
+if (!builder.Environment.IsDevelopment())
+{
+    builder.Services.AddApplicationInsightsTelemetry();
+}
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
@@ -103,11 +104,11 @@ if (app.Environment.IsDevelopment())
 
     // Azure App Service handles HTTPS termination itself so only needed in Development
     app.UseHttpsRedirection();
+    app.UseCors("BlazorClient");
 }
 
 app.MapOpenApi();
 app.MapScalarApiReference();
-app.UseCors("BlazorClient");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<AuditMiddleware>();

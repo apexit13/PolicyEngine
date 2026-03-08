@@ -67,8 +67,10 @@ builder.Services.AddCors(options =>
     options.AddPolicy("BlazorClient", policy =>
     {
         policy
-            .WithOrigins(builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()
-                         ?? ["https://localhost:5001"])
+            .WithOrigins(
+                "https://white-bay-09fb46b0f.4.azurestaticapps.net",
+                "https://localhost:5068",
+                "https://localhost:7026")
             .AllowAnyHeader()
             .AllowAnyMethod();
     });

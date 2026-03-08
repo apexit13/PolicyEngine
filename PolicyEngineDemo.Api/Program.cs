@@ -74,6 +74,11 @@ builder.Services.AddCors(options =>
     });
 });
 
+if (!builder.Environment.IsDevelopment())
+{
+    builder.Services.AddApplicationInsightsTelemetry();
+}
+
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddHttpContextAccessor();
@@ -86,7 +91,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
-// ── PIPELINE ────────────────────────────────────────────────────────────────
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();

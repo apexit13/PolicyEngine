@@ -2,5 +2,6 @@
   <Project Path="PolicyEngineDemo.Api/PolicyEngineDemo.Api.csproj" />
   <Project Path="PolicyEngineDemo.Contracts/PolicyEngineDemo.Contracts.csproj" />
   <Project Path="PolicyEngineDemo.Core/PolicyEngineDemo.Core.csproj" />
+  <Project Path="PolicyEngineDemo.Tests/PolicyEngineDemo.Tests.csproj" />
   <Project Path="PolicyEngineDemo.Web/PolicyEngineDemo.Web.csproj" />
 </Solution>

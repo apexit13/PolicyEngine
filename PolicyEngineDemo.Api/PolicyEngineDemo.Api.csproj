@@ -4,6 +4,9 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Added Project GUID to satisfy test discovery which expects a project GUID
+         (prevents warnings like: "Could not find project with GUID 919fd655-f067-4ba2-b932-d926e85dd6b4") -->
+    <ProjectGuid>{919fd655-f067-4ba2-b932-d926e85dd6b4}</ProjectGuid>
   </PropertyGroup>
 
   <ItemGroup>

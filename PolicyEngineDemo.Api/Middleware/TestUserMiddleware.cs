@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using PolicyEngineDemo.Contracts.Constants;
 
 namespace PolicyEngineDemo.Api.Middleware;
 
@@ -24,11 +25,11 @@ public class TestUserMiddleware
 
             var claims = new[]
             {
-                new Claim("tid", tenantHeader),
+                new Claim("tenant_id", tenantHeader),
                 new Claim(ClaimTypes.NameIdentifier, "test-user-123"),
 
                 // Must match the namespace used in Program.cs authorization policies
-                new Claim("https://policyengine/roles", role)
+                new Claim(ClaimNames.Roles, role)
             };
 
             var identity = new ClaimsIdentity(claims, "TestAuth");

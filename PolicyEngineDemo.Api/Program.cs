@@ -1,14 +1,17 @@
-using Serilog;
-using Serilog.Events;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using PolicyEngineDemo.Api.Middleware;
 using PolicyEngineDemo.Api.Services;
+using PolicyEngineDemo.Contracts.Constants;
 using PolicyEngineDemo.Contracts.Data;
 using PolicyEngineDemo.Contracts.Interfaces;
 using Scalar.AspNetCore;
-using System.Security.Claims;
+using Serilog;
+using Serilog.Events;
 
 // ── SERILOG ─────────────────────────────────────────────────────────────────
 Log.Logger = new LoggerConfiguration()
@@ -28,6 +31,11 @@ Log.Logger = new LoggerConfiguration()
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog();
+
+// Prevent .NET from mapping short OIDC claims (like 'sub' or 'tid') 
+// to legacy Microsoft XML namespaces. This ensures our Claims match 
+// the exact keys coming from Auth0.
+JsonWebTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
 // ── AUTHENTICATION ──────────────────────────────────────────────────────────
 // Validates Auth0-issued JWTs on every request.
@@ -55,10 +63,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Policy.Admin", policy =>
-        policy.RequireClaim("https://policyengine/roles", "Policy.Admin"));
+        policy.RequireClaim(ClaimNames.Roles, "Policy.Admin"));
 
     options.AddPolicy("Policy.Viewer", policy =>
-        policy.RequireClaim("https://policyengine/roles", "Policy.Viewer", "Policy.Admin"));
+        policy.RequireClaim(ClaimNames.Roles, "Policy.Viewer", "Policy.Admin"));
 });
 
 // CORS is just implemented for local dev.
@@ -98,7 +106,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 
-    // Mock middleware stays active in Development so you can still test
+    // Mock middleware stays active in Development so we can still test
     // locally via Scalar with the X-Tenant header — no Auth0 token needed.
     app.UseMiddleware<TestUserMiddleware>();
 

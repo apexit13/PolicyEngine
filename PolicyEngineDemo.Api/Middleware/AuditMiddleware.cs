@@ -1,4 +1,5 @@
 using Microsoft.IO;
+using PolicyEngineDemo.Contracts.Constants;
 using PolicyEngineDemo.Contracts.Data;
 using PolicyEngineDemo.Contracts.Models;
 using System.Diagnostics;
@@ -75,7 +76,7 @@ public class AuditMiddleware
         var userId = context.User?.FindFirst(
             System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
         var tenantId = context.User?.FindFirst(
-            "http://schemas.microsoft.com/identity/claims/tenantid")?.Value;
+            ClaimNames.TenantId)?.Value;
 
         var statusCode = context.Response.StatusCode;
         var durationMs = sw.ElapsedMilliseconds;

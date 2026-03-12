@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using PolicyEngine.Api.Controllers;
+using PolicyEngineDemo.Contracts.Constants;
 using PolicyEngineDemo.Contracts.Data;
 using PolicyEngineDemo.Contracts.Interfaces;
 using PolicyEngineDemo.Contracts.Models;
@@ -37,11 +38,11 @@ public class PolicyControllerTests
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, "user-1"),
-            new("http://schemas.microsoft.com/identity/claims/tenantid", tenantId)
+            new(ClaimNames.TenantId, tenantId)
         };
 
         if (isAdmin)
-            claims.Add(new Claim("https://policyengine/roles", "Policy.Admin"));
+            claims.Add(new Claim(ClaimNames.Roles, "Policy.Admin"));
 
         var identity = new ClaimsIdentity(claims, "TestAuth");
         var principal = new ClaimsPrincipal(identity);

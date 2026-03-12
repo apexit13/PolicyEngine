@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+using PolicyEngineDemo.Contracts.Constants;
 using System.Text.Json;
 
 namespace PolicyEngineDemo.Web.Services;
@@ -36,7 +37,7 @@ public class RoleService
 
             foreach (var prop in payload.Value.EnumerateObject())
             {
-                if (prop.Name != "https://policyengine/roles")
+                if (prop.Name != ClaimNames.Roles)
                     continue;
 
                 if (prop.Value.ValueKind == JsonValueKind.Array)

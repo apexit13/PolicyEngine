@@ -1,11 +1,11 @@
 ﻿using System.Security.Claims;
+using PolicyEngineDemo.Contracts.Constants;
 using PolicyEngineDemo.Contracts.Interfaces;
 
 namespace PolicyEngineDemo.Api.Services;
 
 public class TenantProvider : ITenantProvider
 {
-    private const string ClaimType = "http://schemas.microsoft.com/identity/claims/tenantid";
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     public TenantProvider(IHttpContextAccessor httpContextAccessor)
@@ -13,11 +13,11 @@ public class TenantProvider : ITenantProvider
         _httpContextAccessor = httpContextAccessor;
     }
 
-    // Pulls the 'tid' (Tenant ID) claim from the JWT
+    // Pulls the 'tenant_id' claim from the JWT
     public string? TenantId() =>
-        _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimType);
+        _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimNames.TenantId);
 
-    // Pulls the 'sub' (Subject/User ID) claim from the JWT
+    // Pulls the current user's identifier claim from the JWT
     public string? UserId() =>
         _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
 }

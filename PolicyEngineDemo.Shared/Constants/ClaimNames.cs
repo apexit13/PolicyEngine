@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace PolicyEngineDemo.Shared.Constants
+﻿namespace PolicyEngineDemo.Shared.Constants
 {
     public static class ClaimNames
     {

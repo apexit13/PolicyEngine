@@ -1,13 +1,14 @@
 @page "/policies/new"
 @page "/policies/{Id:guid}/edit"
 @using MudBlazor
+@using PolicyEngineDemo.Shared.Interfaces
 @using PolicyEngineDemo.Shared.Requests
 @using PolicyEngineDemo.Shared.Responses
 @using PolicyEngineDemo.Web.Services
-@inject PolicyService PolicyService
+@inject IPolicyService PolicyService
+@inject IRoleService RoleService
 @inject NavigationManager Navigation
 @inject ISnackbar Snackbar
-@inject RoleService RoleService
 
 <PageTitle>@(_isNew ? "New Policy" : "Edit Policy") — PolicyEngineDemo</PageTitle>
 

@@ -1,9 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using PolicyEngineDemo.Shared.Constants;
-using PolicyEngineDemo.Shared.Data;
-using PolicyEngineDemo.Shared.Models;
+using PolicyEngineDemo.Shared.Interfaces;
 using PolicyEngineDemo.Shared.Requests;
 using PolicyEngineDemo.Shared.Responses;
 
@@ -14,11 +11,11 @@ namespace PolicyEngine.Api.Controllers;
 [Authorize]
 public class PolicyController : ControllerBase
 {
-    private readonly AppDbContext _context;
+    private readonly IPolicyService _policyService;
 
-    public PolicyController(AppDbContext context)
+    public PolicyController(IPolicyService policyService)
     {
-        _context = context;
+        _policyService = policyService;
     }
 
     // GET: api/policy
@@ -26,16 +23,8 @@ public class PolicyController : ControllerBase
     [Authorize(Policy = "Policy.Viewer")]
     public async Task<ActionResult<IEnumerable<PolicyResponse>>> GetPolicies()
     {
-        var isAdmin = User.HasClaim(ClaimNames.Roles, "Policy.Admin");
-
-        var query = _context.Policies.AsQueryable();
-
-        if (!isAdmin)
-            query = query.Where(p => p.IsActive);
-
-        var policies = await query.ToListAsync();
-
-        return Ok(policies.Select(MapToResponse));
+        var policies = await _policyService.GetPoliciesAsync();
+        return Ok(policies);
     }
 
     // GET: api/policy/{id}
@@ -43,65 +32,26 @@ public class PolicyController : ControllerBase
     [Authorize(Policy = "Policy.Viewer")]
     public async Task<ActionResult<PolicyResponse>> GetPolicy(Guid id)
     {
-        var policy = await _context.Policies
-            .SingleOrDefaultAsync(p => p.Id == id);
-
-        if (policy is null)
-            return NotFound();
-
-        return Ok(MapToResponse(policy));
+        var policy = await _policyService.GetPolicyAsync(id);
+        return policy is null ? NotFound() : Ok(policy);
     }
 
     // POST: api/policy
     [HttpPost]
     [Authorize(Policy = "Policy.Admin")]
-    public async Task<ActionResult<PolicyResponse>> CreatePolicy(
-        CreatePolicyRequest request)
+    public async Task<ActionResult<PolicyResponse>> CreatePolicy(CreatePolicyRequest request)
     {
-        var policy = new Policy
-        {
-            Title = request.Title,
-            Description = request.Description,
-            IsActive = request.IsActive
-        };
-
-        _context.Policies.Add(policy);
-        await _context.SaveChangesAsync();
-
-        return CreatedAtAction(
-            nameof(GetPolicy),
-            new { id = policy.Id },
-            MapToResponse(policy));
+        var policy = await _policyService.CreatePolicyAsync(request);
+        return CreatedAtAction(nameof(GetPolicy), new { id = policy!.Id }, policy);
     }
 
     // PUT: api/policy/{id}
     [HttpPut("{id}")]
     [Authorize(Policy = "Policy.Admin")]
-    public async Task<ActionResult<PolicyResponse>> UpdatePolicy(
-        Guid id, UpdatePolicyRequest request)
+    public async Task<ActionResult<PolicyResponse>> UpdatePolicy(Guid id, UpdatePolicyRequest request)
     {
-        var policy = await _context.Policies
-            .SingleOrDefaultAsync(p => p.Id == id);
-
-        if (policy is null)
-            return NotFound();
-
-        policy.Title = request.Title;
-        policy.Description = request.Description;
-        policy.IsActive = request.IsActive;
-
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!await _context.Policies.AnyAsync(p => p.Id == id))
-                return NotFound();
-            throw;
-        }
-
-        return Ok(MapToResponse(policy));
+        var policy = await _policyService.UpdatePolicyAsync(id, request);
+        return policy is null ? NotFound() : Ok(policy);
     }
 
     // PATCH: api/policy/{id}/toggle
@@ -109,16 +59,8 @@ public class PolicyController : ControllerBase
     [Authorize(Policy = "Policy.Admin")]
     public async Task<IActionResult> ToggleActive(Guid id)
     {
-        var policy = await _context.Policies
-            .SingleOrDefaultAsync(p => p.Id == id);
-
-        if (policy is null)
-            return NotFound();
-
-        policy.IsActive = !policy.IsActive;
-        await _context.SaveChangesAsync();
-
-        return Ok(new { policy.Id, policy.IsActive });
+        await _policyService.ToggleActiveAsync(id);
+        return Ok();
     }
 
     // DELETE: api/policy/{id}
@@ -126,27 +68,7 @@ public class PolicyController : ControllerBase
     [Authorize(Policy = "Policy.Admin")]
     public async Task<IActionResult> DeletePolicy(Guid id)
     {
-        var policy = await _context.Policies
-            .SingleOrDefaultAsync(p => p.Id == id);
-
-        if (policy is null)
-            return NotFound();
-
-        _context.Policies.Remove(policy);
-        await _context.SaveChangesAsync();
-
+        await _policyService.DeletePolicyAsync(id);
         return NoContent();
     }
-
-    // ── Private mapping ──────────────────────────────────────────────────────
-    private static PolicyResponse MapToResponse(Policy p) => new()
-    {
-        Id = p.Id,
-        Title = p.Title,
-        Description = p.Description,
-        IsActive = p.IsActive,
-        TenantId = p.TenantId,
-        CreatedAt = p.CreatedAt,
-        CreatedBy = p.CreatedBy
-    };
 }

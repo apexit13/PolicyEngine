@@ -4,12 +4,14 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using MudBlazor
+@using PolicyEngineDemo.Shared.Interfaces
 @using PolicyEngineDemo.Shared.Responses
 @using PolicyEngineDemo.Web.Services
-@inject PolicyService PolicyService
+@inject IPolicyService PolicyService
+@inject IRoleService RoleService
 @inject NavigationManager Navigation
 @inject ISnackbar Snackbar
-@inject RoleService RoleService
+
 
 <PageTitle>Policies — PolicyEngineDemo</PageTitle>
 

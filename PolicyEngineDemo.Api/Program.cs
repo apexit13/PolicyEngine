@@ -1,4 +1,3 @@
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -6,8 +5,9 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using PolicyEngineDemo.Api.Middleware;
 using PolicyEngineDemo.Api.Services;
+using PolicyEngineDemo.Core.Data;
+using PolicyEngineDemo.Core.Services;
 using PolicyEngineDemo.Shared.Constants;
-using PolicyEngineDemo.Shared.Data;
 using PolicyEngineDemo.Shared.Interfaces;
 using Scalar.AspNetCore;
 using Serilog;
@@ -93,6 +93,7 @@ if (!builder.Environment.IsDevelopment())
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IPolicyService, PolicyService>();
 builder.Services.AddScoped<ITenantProvider, TenantProvider>();
 builder.Services.AddSingleton<Microsoft.IO.RecyclableMemoryStreamManager>();
 

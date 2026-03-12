@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
+using PolicyEngineDemo.Shared.Interfaces;
 using PolicyEngineDemo.Web;
 using PolicyEngineDemo.Web.Services;
 
@@ -47,8 +48,8 @@ builder.Services.AddScoped(sp =>
       .CreateClient("AuthorizedClient"));
 
 // ── APP SERVICES ────────────────────────────────────────────────────────────
-builder.Services.AddScoped<PolicyService>();
-builder.Services.AddScoped<RoleService>();
+builder.Services.AddScoped<IPolicyService, PolicyService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
 
 // ── MUDBLAZOR ───────────────────────────────────────────────────────────────
 builder.Services.AddMudServices();

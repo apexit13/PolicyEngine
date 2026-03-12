@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace PolicyEngineDemo.Shared.Requests
+﻿namespace PolicyEngineDemo.Shared.Requests
 {
     public class UpdatePolicyRequest
     {

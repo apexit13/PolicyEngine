@@ -1,6 +1,7 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using PolicyEngineDemo.Shared.Constants;
-using System.Text.Json;
+using PolicyEngineDemo.Shared.Interfaces;
 
 namespace PolicyEngineDemo.Web.Services;
 
@@ -8,7 +9,7 @@ namespace PolicyEngineDemo.Web.Services;
 // Auth0 puts roles in the access token only (not ID token), so we can't use
 // the standard ClaimsPrincipal roles. Instead we decode the JWT ourselves
 // after auth is complete — safe to do in components, not during initialization.
-public class RoleService
+public class RoleService : IRoleService
 {
     private readonly IAccessTokenProvider _tokenProvider;
 

@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using PolicyEngineDemo.Shared.Interfaces;
 using PolicyEngineDemo.Shared.Requests;
 using PolicyEngineDemo.Shared.Responses;
 
@@ -9,7 +10,7 @@ namespace PolicyEngineDemo.Web.Services;
 /// The HttpClient is pre-configured in Program.cs to attach the Auth0
 /// bearer token on every request automatically.
 /// </summary>
-public class PolicyService
+public class PolicyService : IPolicyService
 {
     private readonly HttpClient _http;
 

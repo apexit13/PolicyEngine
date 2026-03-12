@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace PolicyEngineDemo.Shared.Interfaces
+﻿namespace PolicyEngineDemo.Shared.Interfaces
 {
     public interface IBaseEntity
     {

@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using PolicyEngineDemo.Core.Models;
 using PolicyEngineDemo.Shared.Interfaces;
-using PolicyEngineDemo.Shared.Models;
 
-namespace PolicyEngineDemo.Shared.Data;
+namespace PolicyEngineDemo.Core.Data;
 
 public class AppDbContext : DbContext
 {
@@ -40,7 +40,7 @@ public class AppDbContext : DbContext
         foreach (var entry in ChangeTracker.Entries<Policy>()
             .Where(e => e.State == EntityState.Added))
         {
-            entry.Entity.TenantId  = _tenantProvider.TenantId() ?? "";
+            entry.Entity.TenantId = _tenantProvider.TenantId() ?? "";
             entry.Entity.CreatedAt = DateTime.UtcNow;
             entry.Entity.CreatedBy = _tenantProvider.UserId() ?? "";
         }

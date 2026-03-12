@@ -18,4 +18,12 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PolicyEngineDemo.Shared\PolicyEngineDemo.Shared.csproj" />
+  </ItemGroup>
+
 </Project>

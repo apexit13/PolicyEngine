@@ -1,7 +1,8 @@
 @using MudBlazor
 @using Microsoft.AspNetCore.Components.Authorization
+@using PolicyEngineDemo.Shared.Interfaces
 @using PolicyEngineDemo.Web.Services
-@inject RoleService RoleService
+@inject IRoleService RoleService
 
 <MudNavMenu>
     <MudNavLink Href="/" Match="NavLinkMatch.All"

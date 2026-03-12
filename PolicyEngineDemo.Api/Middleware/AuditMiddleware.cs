@@ -1,8 +1,8 @@
-using Microsoft.IO;
-using PolicyEngineDemo.Shared.Constants;
-using PolicyEngineDemo.Shared.Data;
-using PolicyEngineDemo.Shared.Models;
 using System.Diagnostics;
+using Microsoft.IO;
+using PolicyEngineDemo.Core.Data;
+using PolicyEngineDemo.Core.Models;
+using PolicyEngineDemo.Shared.Constants;
 
 namespace PolicyEngineDemo.Api.Middleware;
 
@@ -85,13 +85,13 @@ public class AuditMiddleware
         var entry = new AuditLog
         {
             TimestampUtc = DateTime.UtcNow,
-            Method       = method,
-            Endpoint     = endpoint,
-            UserId       = userId,
-            TenantId     = tenantId,
-            RequestBody  = requestBody,
-            StatusCode   = statusCode,
-            DurationMs   = durationMs,
+            Method = method,
+            Endpoint = endpoint,
+            UserId = userId,
+            TenantId = tenantId,
+            RequestBody = requestBody,
+            StatusCode = statusCode,
+            DurationMs = durationMs,
         };
 
         try
@@ -111,7 +111,7 @@ public class AuditMiddleware
             method,
             endpoint,
             tenantId ?? "anon",
-            userId   ?? "anon",
+            userId ?? "anon",
             statusCode,
             durationMs,
             requestBody ?? "-");

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace PolicyEngineDemo.Shared.Responses
+﻿namespace PolicyEngineDemo.Shared.Responses
 {
     public class PolicyResponse
     {

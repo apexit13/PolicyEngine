@@ -1,4 +1,4 @@
-namespace PolicyEngineDemo.Contracts.Models;
+namespace PolicyEngineDemo.Shared.Models;
 
 public class AuditLog
 {

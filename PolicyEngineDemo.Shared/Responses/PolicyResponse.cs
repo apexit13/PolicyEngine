@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace PolicyEngineDemo.Contracts.Responses
+namespace PolicyEngineDemo.Shared.Responses
 {
     public class PolicyResponse
     {

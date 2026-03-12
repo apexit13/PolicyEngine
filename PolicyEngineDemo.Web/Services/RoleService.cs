@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
-using PolicyEngineDemo.Contracts.Constants;
+using PolicyEngineDemo.Shared.Constants;
 using System.Text.Json;
 
 namespace PolicyEngineDemo.Web.Services;

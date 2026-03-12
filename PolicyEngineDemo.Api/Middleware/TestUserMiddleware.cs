@@ -1,5 +1,5 @@
 ﻿using System.Security.Claims;
-using PolicyEngineDemo.Contracts.Constants;
+using PolicyEngineDemo.Shared.Constants;
 
 namespace PolicyEngineDemo.Api.Middleware;
 

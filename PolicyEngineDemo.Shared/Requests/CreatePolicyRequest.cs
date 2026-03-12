@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace PolicyEngineDemo.Contracts.Requests
+namespace PolicyEngineDemo.Shared.Requests
 {
     public class CreatePolicyRequest
     {

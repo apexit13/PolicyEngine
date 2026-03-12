@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
-using PolicyEngineDemo.Contracts.Constants;
-using PolicyEngineDemo.Contracts.Interfaces;
+using PolicyEngineDemo.Shared.Constants;
+using PolicyEngineDemo.Shared.Interfaces;
 
 namespace PolicyEngineDemo.Api.Services;
 

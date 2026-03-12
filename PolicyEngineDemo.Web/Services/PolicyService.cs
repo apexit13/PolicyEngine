@@ -1,6 +1,6 @@
 using System.Net.Http.Json;
-using PolicyEngineDemo.Contracts.Requests;
-using PolicyEngineDemo.Contracts.Responses;
+using PolicyEngineDemo.Shared.Requests;
+using PolicyEngineDemo.Shared.Responses;
 
 namespace PolicyEngineDemo.Web.Services;
 

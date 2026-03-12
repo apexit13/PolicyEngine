@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace PolicyEngineDemo.Contracts.Interfaces
+namespace PolicyEngineDemo.Shared.Interfaces
 {
     public interface IBaseEntity
     {

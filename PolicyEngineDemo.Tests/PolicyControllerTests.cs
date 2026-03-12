@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using PolicyEngine.Api.Controllers;
-using PolicyEngineDemo.Contracts.Constants;
-using PolicyEngineDemo.Contracts.Data;
-using PolicyEngineDemo.Contracts.Interfaces;
-using PolicyEngineDemo.Contracts.Models;
-using PolicyEngineDemo.Contracts.Requests;
-using PolicyEngineDemo.Contracts.Responses;
+using PolicyEngineDemo.Shared.Constants;
+using PolicyEngineDemo.Shared.Data;
+using PolicyEngineDemo.Shared.Interfaces;
+using PolicyEngineDemo.Shared.Models;
+using PolicyEngineDemo.Shared.Requests;
+using PolicyEngineDemo.Shared.Responses;
 using System.Security.Claims;
 
 namespace PolicyEngineDemo.Tests;

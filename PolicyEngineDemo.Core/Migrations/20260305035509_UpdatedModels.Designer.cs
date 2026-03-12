@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using PolicyEngineDemo.Contracts.Data;
+using PolicyEngineDemo.Shared.Data;
 
 #nullable disable
 
-namespace PolicyEngineDemo.Contracts.Migrations
+namespace PolicyEngineDemo.Shared.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     [Migration("20260305035509_UpdatedModels")]
@@ -25,7 +25,7 @@ namespace PolicyEngineDemo.Contracts.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("PolicyEngineDemo.Contracts.Models.AuditLog", b =>
+            modelBuilder.Entity("PolicyEngineDemo.Shared.Models.AuditLog", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -64,7 +64,7 @@ namespace PolicyEngineDemo.Contracts.Migrations
                     b.ToTable("AuditLogs", (string)null);
                 });
 
-            modelBuilder.Entity("PolicyEngineDemo.Contracts.Models.Policy", b =>
+            modelBuilder.Entity("PolicyEngineDemo.Shared.Models.Policy", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()

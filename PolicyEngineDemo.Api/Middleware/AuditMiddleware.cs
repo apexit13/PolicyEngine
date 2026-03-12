@@ -1,7 +1,7 @@
 using Microsoft.IO;
-using PolicyEngineDemo.Contracts.Constants;
-using PolicyEngineDemo.Contracts.Data;
-using PolicyEngineDemo.Contracts.Models;
+using PolicyEngineDemo.Shared.Constants;
+using PolicyEngineDemo.Shared.Data;
+using PolicyEngineDemo.Shared.Models;
 using System.Diagnostics;
 
 namespace PolicyEngineDemo.Api.Middleware;

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace PolicyEngineDemo.Contracts.Constants
+namespace PolicyEngineDemo.Shared.Constants
 {
     public static class ClaimNames
     {

@@ -1,0 +1,17 @@
+﻿@page "/"
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using PolicyEngineDemo.Shared.Interfaces
+@inject NavigationManager Nav
+@inject IRoleService RoleService
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        if (await RoleService.IsAdminAsync())
+            Nav.NavigateTo("/dashboard", replace: true);
+        else
+            Nav.NavigateTo("/policies", replace: true);
+    }
+}

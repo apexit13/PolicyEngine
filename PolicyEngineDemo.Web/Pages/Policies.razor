@@ -1,4 +1,3 @@
-@page "/"
 @page "/policies"
 @attribute [Authorize]
 @using Microsoft.AspNetCore.Authorization
@@ -18,14 +17,13 @@
 <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-4">
     <MudText Typo="Typo.h5"><b>Policies</b></MudText>
     <MudSpacer />
-    @if (_isAdmin)
-    {
+    <AuthorizeView Policy="Policy.Admin">
         <MudButton Variant="Variant.Filled" Color="Color.Primary"
                    StartIcon="@Icons.Material.Filled.Add"
                    Href="/policies/new">
             New Policy
         </MudButton>
-    }
+    </AuthorizeView>
 </MudStack>
 
 <MudPaper Class="pa-4 mb-4" Elevation="1">
@@ -38,15 +36,14 @@
                       Variant="Variant.Outlined"
                       Immediate="true"
                       Class="flex-grow-1" />
-        @if (_isAdmin)
-        {
+        <AuthorizeView Policy="Policy.Admin">
             <MudSelect T="string" @bind-Value="_statusFilter"
             Label="Status" Variant="Variant.Outlined" Style="min-width:140px">
                 <MudSelectItem Value="@("All")">All</MudSelectItem>
                 <MudSelectItem Value="@("Active")">Active</MudSelectItem>
                 <MudSelectItem Value="@("Inactive")">Inactive</MudSelectItem>
             </MudSelect>
-        }
+        </AuthorizeView>
     </MudStack>
 </MudPaper>
 
@@ -65,15 +62,13 @@ else
         <HeaderContent>
             <MudTh>Title</MudTh>
             <MudTh>Description</MudTh>
-            @if (_isAdmin)
-            {
+            <AuthorizeView Policy="Policy.Admin">   
                 <MudTh>Status</MudTh>
-            }
+            </AuthorizeView>
             <MudTh>Created</MudTh>
-            @if (_isAdmin)
-            {
+            <AuthorizeView Policy="Policy.Admin">
                 <MudTh>Actions</MudTh>
-            }
+            </AuthorizeView>
         </HeaderContent>
         <RowTemplate Context="policy">
             <MudTd DataLabel="Title">
@@ -84,8 +79,7 @@ else
                     @policy.Description
                 </MudText>
             </MudTd>
-            @if (_isAdmin)
-            {
+            <AuthorizeView Policy="Policy.Admin">
                 <MudTd DataLabel="Status">
                     @if (policy.IsActive)
                     {
@@ -102,14 +96,13 @@ else
                         </MudChip>
                     }
                 </MudTd>
-            }
+            </AuthorizeView>
             <MudTd DataLabel="Created">
                 <MudText Typo="Typo.caption">
                     @policy.CreatedAt.ToString("dd MMM yyyy")
                 </MudText>
             </MudTd>
-            @if (_isAdmin)
-            {
+            <AuthorizeView Policy="Policy.Admin">
                 <MudTd DataLabel="Actions">
                     <MudStack Row="true" Spacing="1">
                         <MudTooltip Text="Edit">
@@ -133,7 +126,7 @@ else
                         </MudTooltip>
                     </MudStack>
                 </MudTd>
-            }
+            </AuthorizeView>
         </RowTemplate>
         <PagerContent>
             <MudTablePager />
@@ -144,7 +137,7 @@ else
 @code {
     private List<PolicyResponse> _policies = [];
     private bool _loading = true;
-    private bool _isAdmin = false;
+    //private bool _isAdmin = false;
     private string _search = string.Empty;
     private string _statusFilter = "All";
 
@@ -166,7 +159,7 @@ else
             var authState = await AuthenticationStateTask;
             if (authState.User.Identity?.IsAuthenticated == true)
             {
-                _isAdmin = await RoleService.IsAdminAsync();
+                //_isAdmin = await RoleService.IsAdminAsync();
                 await LoadAsync();
             }
         }

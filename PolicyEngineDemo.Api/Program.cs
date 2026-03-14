@@ -93,6 +93,7 @@ if (!builder.Environment.IsDevelopment())
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IPolicyService, PolicyService>();
 builder.Services.AddScoped<ITenantProvider, TenantProvider>();
 builder.Services.AddSingleton<Microsoft.IO.RecyclableMemoryStreamManager>();

@@ -9,6 +9,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+    <HotReloadAutoRestart>true</HotReloadAutoRestart>
   </PropertyGroup>
 
   <ItemGroup>

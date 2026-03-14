@@ -1,0 +1,300 @@
+@page "/dashboard"
+@attribute [Authorize(Policy = "Policy.Admin")]
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using MudBlazor
+@using MudBlazor.Charts
+@using PolicyEngineDemo.Shared.Responses
+@using PolicyEngineDemo.Shared.Interfaces
+@inject IDashboardService DashboardService
+@inject ISnackbar Snackbar
+
+<PageTitle>Dashboard — PolicyEngineDemo</PageTitle>
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-4">
+    <MudText Typo="Typo.h5"><b>Dashboard</b></MudText>
+    <MudSpacer />
+    <MudTooltip Text="Refresh">
+        <MudIconButton Icon="@Icons.Material.Filled.Refresh"
+                       Color="Color.Default"
+                       OnClick="LoadAsync"
+                       Disabled="_loading" />
+    </MudTooltip>
+</MudStack>
+
+@if (_loading)
+{
+    <MudProgressLinear Indeterminate="true" Color="Color.Primary" Class="mb-4" />
+}
+else if (_dashboard is null)
+{
+    <MudAlert Severity="Severity.Warning">Unable to load dashboard data.</MudAlert>
+}
+else
+{
+    @* ── Stat cards ──────────────────────────────────────────────────────── *@
+    <MudGrid Spacing="3" Class="mb-4">
+
+        <MudItem xs="12" sm="4">
+            <MudPaper Class="pa-4" Elevation="2">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="3">
+                    <MudIcon Icon="@Icons.Material.Filled.Policy"
+                             Color="Color.Primary" Style="font-size:2.5rem;" />
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">Total Policies</MudText>
+                        <MudText Typo="Typo.h4"><b>@_dashboard.TotalPolicies</b></MudText>
+                    </MudStack>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="12" sm="4">
+            <MudPaper Class="pa-4" Elevation="2">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="3">
+                    <MudIcon Icon="@Icons.Material.Filled.CheckCircle"
+                             Color="Color.Success" Style="font-size:2.5rem;" />
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">Active</MudText>
+                        <MudText Typo="Typo.h4"><b>@_dashboard.ActivePolicies</b></MudText>
+                    </MudStack>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="12" sm="4">
+            <MudPaper Class="pa-4" Elevation="2">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="3">
+                    <MudIcon Icon="@Icons.Material.Filled.Cancel"
+                             Color="Color.Default" Style="font-size:2.5rem;" />
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">Inactive</MudText>
+                        <MudText Typo="Typo.h4"><b>@_dashboard.InactivePolicies</b></MudText>
+                    </MudStack>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+
+    </MudGrid>
+
+    @* ── Active rate ──────────────────────────────────────────────────────── *@
+    <MudPaper Class="pa-4 mb-4" Elevation="1">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2" Class="mb-2">
+            <MudText Typo="Typo.h6"><b>Active Rate</b></MudText>
+            <MudSpacer />
+            <MudText Typo="Typo.h6" Color="@ActiveRateColor">
+                <b>@_dashboard.ActiveRatePercent%</b>
+            </MudText>
+        </MudStack>
+        <MudProgressLinear Value="@_dashboard.ActiveRatePercent"
+                           Color="@ActiveRateColor"
+                           Rounded="true"
+                           Size="Size.Large" />
+        <MudText Typo="Typo.caption" Color="Color.Secondary" Class="mt-1">
+            @_dashboard.ActivePolicies of @_dashboard.TotalPolicies policies are active
+        </MudText>
+    </MudPaper>
+
+    @* ── Chart + Recent policies ──────────────────────────────────────────── *@
+    <MudGrid Spacing="3" Class="mb-4">
+
+        <MudItem xs="12" md="6">
+            <MudPaper Class="pa-4" Elevation="1" Style="height:100%">
+                <MudText Typo="Typo.h6" Class="mb-3"><b>Policies by Created Date</b></MudText>
+                @if (_chartSeries.Count == 0 || _chartSeries[0].Data.Count == 0)
+                {
+                    <MudAlert Severity="Severity.Info">Not enough data to display chart.</MudAlert>
+                }
+                else
+                {
+
+                    <MudChart T="double"
+                        ChartType="ChartType.Bar"
+                        ChartSeries="@_chartSeries"
+                        ChartLabels="@_xAxisLabels"
+                        Width="100%" Height="240px" />
+
+                }
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="12" md="6">
+            <MudPaper Class="pa-4" Elevation="1" Style="height:100%">
+                <MudText Typo="Typo.h6" Class="mb-3"><b>Recently Added</b></MudText>
+                @if (_dashboard.RecentPolicies.Count == 0)
+                {
+                    <MudAlert Severity="Severity.Info">No policies yet.</MudAlert>
+                }
+                else
+                {
+                    <MudTable Items="@_dashboard.RecentPolicies"
+                              Hover="true" Striped="true"
+                              Elevation="0" Dense="true"
+                              T="PolicyResponse">
+                        <HeaderContent>
+                            <MudTh>Title</MudTh>
+                            <MudTh>Status</MudTh>
+                            <MudTh>Created</MudTh>
+                        </HeaderContent>
+                        <RowTemplate Context="policy">
+                            <MudTd DataLabel="Title">
+                                <MudText Typo="Typo.body2"><b>@policy.Title</b></MudText>
+                            </MudTd>
+                            <MudTd DataLabel="Status">
+                                @if (policy.IsActive)
+                                {
+                                    <MudChip T="string" Color="Color.Success" Size="Size.Small"
+                                             Icon="@Icons.Material.Filled.CheckCircle">Active</MudChip>
+                                }
+                                else
+                                {
+                                    <MudChip T="string" Color="Color.Default" Size="Size.Small"
+                                             Icon="@Icons.Material.Filled.Cancel">Inactive</MudChip>
+                                }
+                            </MudTd>
+                            <MudTd DataLabel="Created">
+                                <MudText Typo="Typo.caption">
+                                    @policy.CreatedAt.ToString("dd MMM yyyy")
+                                </MudText>
+                            </MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                }
+            </MudPaper>
+        </MudItem>
+
+    </MudGrid>
+
+    @* ── Recent audit activity ────────────────────────────────────────────── *@
+    <MudPaper Class="pa-4" Elevation="1">
+        <MudText Typo="Typo.h6" Class="mb-3"><b>Recent Activity</b></MudText>
+        @if (_dashboard.RecentAuditLogs.Count == 0)
+        {
+            <MudAlert Severity="Severity.Info">No activity recorded yet.</MudAlert>
+        }
+        else
+        {
+            <MudTable Items="@_dashboard.RecentAuditLogs"
+                      Hover="true" Striped="true"
+                      Elevation="0" Dense="true"
+                      T="AuditLogResponse">
+                <HeaderContent>
+                    <MudTh>Action</MudTh>
+                    <MudTh>Endpoint</MudTh>
+                    <MudTh>Status</MudTh>
+                    <MudTh>Duration</MudTh>
+                    <MudTh>When</MudTh>
+                </HeaderContent>
+                <RowTemplate Context="log">
+                    <MudTd DataLabel="Action">
+                        <MudChip T="string"
+                                 Color="@ActionColor(log.Action)"
+                                 Size="Size.Small">
+                            @log.Action
+                        </MudChip>
+                    </MudTd>
+                    <MudTd DataLabel="Endpoint">
+                        <MudText Typo="Typo.caption">@log.Endpoint</MudText>
+                    </MudTd>
+                    <MudTd DataLabel="Status">
+                        <MudText Typo="Typo.caption"
+                                 Color="@StatusColor(log.StatusCode)">
+                            @log.StatusCode
+                        </MudText>
+                    </MudTd>
+                    <MudTd DataLabel="Duration">
+                        <MudText Typo="Typo.caption">@log.DurationMs ms</MudText>
+                    </MudTd>
+                    <MudTd DataLabel="When">
+                        <MudText Typo="Typo.caption">
+                            @log.TimestampUtc.ToLocalTime().ToString("dd MMM yyyy HH:mm")
+                        </MudText>
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+    </MudPaper>
+}
+
+@code {
+    private DashboardResponse? _dashboard;
+    private bool _loading = true;
+
+    private List<ChartSeries<double>> _chartSeries = [];
+    private string[] _xAxisLabels = [];
+
+    [CascadingParameter] private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthenticationStateTask is not null)
+        {
+            var authState = await AuthenticationStateTask;
+            if (authState.User.Identity?.IsAuthenticated == true)
+                await LoadAsync();
+        }
+    }
+
+    private async Task LoadAsync()
+    {
+        _loading = true;
+        try
+        {
+            _dashboard = await DashboardService.GetDashboardAsync();
+            BuildChart();
+        }
+        catch
+        {
+            Snackbar.Add("Failed to load dashboard.", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private void BuildChart()
+    {
+        if (_dashboard?.PoliciesByDate is not { Count: > 0 }) return;
+
+        var sorted = _dashboard.PoliciesByDate.OrderBy(kv => kv.Key).ToList();
+
+        _xAxisLabels = sorted
+            .Select(kv => DateTime.TryParse(kv.Key, out var d) ? d.ToString("dd MMM") : kv.Key)
+            .ToArray();
+
+        _chartSeries =
+        [
+            new ChartSeries<double>
+            {
+                Name = "Policies",
+                Data = sorted.Select(kv => (double)kv.Value).ToArray()
+            }
+        ];
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+
+    private Color ActiveRateColor => _dashboard?.ActiveRatePercent switch
+    {
+        >= 80 => Color.Success,
+        >= 50 => Color.Warning,
+        _     => Color.Error
+    };
+
+    private static Color ActionColor(string action) => action switch
+    {
+        "Created" => Color.Success,
+        "Updated" => Color.Primary,
+        "Toggled" => Color.Warning,
+        "Deleted" => Color.Error,
+        _         => Color.Default
+    };
+
+    private static Color StatusColor(int code) => code switch
+    {
+        >= 200 and < 300 => Color.Success,
+        >= 400 and < 500 => Color.Warning,
+        >= 500           => Color.Error,
+        _                => Color.Default
+    };
+}

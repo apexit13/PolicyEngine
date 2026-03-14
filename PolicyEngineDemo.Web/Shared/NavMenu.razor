@@ -5,25 +5,30 @@
 @inject IRoleService RoleService
 
 <MudNavMenu>
-    <MudNavLink Href="/" Match="NavLinkMatch.All"
+    <AuthorizeView Policy="Policy.Admin">
+        <MudNavLink Href="/dashboard"
+                    Icon="@Icons.Material.Filled.Dashboard">
+            Dashboard
+        </MudNavLink>
+    </AuthorizeView>
+    <MudNavLink Href="/policies" Match="NavLinkMatch.All"
                 Icon="@Icons.Material.Filled.Policy">
         Policies
     </MudNavLink>
 
-    @if (_isAdmin)
-    {
+    <AuthorizeView Policy="Policy.Admin">
         <MudNavLink Href="/policies/new"
                     Icon="@Icons.Material.Filled.AddCircle">
             New Policy
         </MudNavLink>
-    }
+    </AuthorizeView>
 </MudNavMenu>
 
-@code {
+@* @code {
     private bool _isAdmin = false;
 
     protected override async Task OnInitializedAsync()
     {
         _isAdmin = await RoleService.IsAdminAsync();
     }
-}
+} *@

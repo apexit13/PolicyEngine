@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using PolicyEngineDemo.Shared.Interfaces;
 using PolicyEngineDemo.Shared.Requests;
 using PolicyEngineDemo.Shared.Responses;
@@ -37,7 +38,7 @@ public class PolicyController : ControllerBase
     }
 
     // POST: api/policy
-    [HttpPost]
+    [HttpPost, EnableRateLimiting("writes")]
     [Authorize(Policy = "Policy.Admin")]
     public async Task<ActionResult<PolicyResponse>> CreatePolicy(CreatePolicyRequest request)
     {
@@ -46,7 +47,7 @@ public class PolicyController : ControllerBase
     }
 
     // PUT: api/policy/{id}
-    [HttpPut("{id}")]
+    [HttpPut("{id}"), EnableRateLimiting("writes")]
     [Authorize(Policy = "Policy.Admin")]
     public async Task<ActionResult<PolicyResponse>> UpdatePolicy(Guid id, UpdatePolicyRequest request)
     {
@@ -55,7 +56,7 @@ public class PolicyController : ControllerBase
     }
 
     // PATCH: api/policy/{id}/toggle
-    [HttpPatch("{id}/toggle")]
+    [HttpPatch("{id}/toggle"), EnableRateLimiting("writes")]
     [Authorize(Policy = "Policy.Admin")]
     public async Task<IActionResult> ToggleActive(Guid id)
     {
@@ -64,7 +65,7 @@ public class PolicyController : ControllerBase
     }
 
     // DELETE: api/policy/{id}
-    [HttpDelete("{id}")]
+    [HttpDelete("{id}"), EnableRateLimiting("writes")]
     [Authorize(Policy = "Policy.Admin")]
     public async Task<IActionResult> DeletePolicy(Guid id)
     {

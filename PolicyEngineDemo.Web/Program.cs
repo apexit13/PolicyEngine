@@ -62,7 +62,6 @@ builder.Services.AddScoped(sp =>
 // ── APP SERVICES ────────────────────────────────────────────────────────────
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IPolicyService, PolicyService>();
-builder.Services.AddScoped<IRoleService, RoleService>();
 
 // ── MUDBLAZOR ───────────────────────────────────────────────────────────────
 builder.Services.AddMudServices();

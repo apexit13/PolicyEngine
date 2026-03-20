@@ -222,7 +222,8 @@ else
     private List<ChartSeries<double>> _chartSeries = [];
     private string[] _xAxisLabels = [];
 
-    [CascadingParameter] private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+    [CascadingParameter] 
+    private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
 
     protected override async Task OnInitializedAsync()
     {

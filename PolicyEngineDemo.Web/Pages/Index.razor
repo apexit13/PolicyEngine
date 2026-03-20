@@ -2,16 +2,20 @@
 @attribute [Authorize]
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
-@using PolicyEngineDemo.Shared.Interfaces
+@inject IAuthorizationService AuthorizationService
 @inject NavigationManager Nav
-@inject IRoleService RoleService
 
 @code {
+    [CascadingParameter] 
+    private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
-        if (await RoleService.IsAdminAsync())
-            Nav.NavigateTo("/dashboard", replace: true);
-        else
-            Nav.NavigateTo("/policies", replace: true);
+        if (AuthenticationStateTask is null) return;
+
+        var authState = await AuthenticationStateTask;
+        var result = await AuthorizationService.AuthorizeAsync(authState.User, "Policy.Admin");
+
+        Nav.NavigateTo(result.Succeeded ? "/dashboard" : "/policies", replace: true);
     }
 }

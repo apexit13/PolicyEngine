@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -85,6 +86,45 @@ builder.Services.AddCors(options =>
     });
 });
 
+
+// Use rate limiter to protect the API from abuse and prevent noisy neighbors in a multi-tenant environment.
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    // Default policy — applies to all endpoints
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+    {
+        var userId = context.User.FindFirst(ClaimNames.TenantId)?.Value
+                     ?? context.Connection.RemoteIpAddress?.ToString()
+                     ?? "anonymous";
+
+        return RateLimitPartition.GetFixedWindowLimiter(userId, _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit          = 100,
+            Window               = TimeSpan.FromMinutes(1),
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+            QueueLimit           = 0
+        });
+    });
+
+    // Stricter policy for write operations
+    options.AddPolicy("writes", context =>
+    {
+        var userId = context.User.FindFirst(ClaimNames.TenantId)?.Value
+                     ?? context.Connection.RemoteIpAddress?.ToString()
+                     ?? "anonymous";
+
+        return RateLimitPartition.GetFixedWindowLimiter($"writes:{userId}", _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit          = 20,
+            Window               = TimeSpan.FromMinutes(1),
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+            QueueLimit           = 0
+        });
+    });
+});
+
 if (!builder.Environment.IsDevelopment())
 {
     builder.Services.AddApplicationInsightsTelemetry();
@@ -122,5 +162,6 @@ app.MapScalarApiReference();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<AuditMiddleware>();
+app.UseRateLimiter();
 app.MapControllers();
 app.Run();

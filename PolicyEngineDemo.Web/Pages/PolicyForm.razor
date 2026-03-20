@@ -1,12 +1,13 @@
 @page "/policies/new"
 @page "/policies/{Id:guid}/edit"
+@using Microsoft.AspNetCore.Authorization
 @using MudBlazor
 @using PolicyEngineDemo.Shared.Interfaces
 @using PolicyEngineDemo.Shared.Requests
 @using PolicyEngineDemo.Shared.Responses
 @using PolicyEngineDemo.Web.Services
 @inject IPolicyService PolicyService
-@inject IRoleService RoleService
+@inject IAuthorizationService AuthorizationService
 @inject NavigationManager Navigation
 @inject ISnackbar Snackbar
 
@@ -67,6 +68,9 @@ else
 }
 
 @code {
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+    
     [Parameter] public Guid? Id { get; set; }
 
     private bool _isNew => Id is null;
@@ -86,9 +90,11 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        if (!await RoleService.IsAdminAsync())
+        var authState = await AuthenticationStateTask!;
+        var result = await AuthorizationService.AuthorizeAsync(authState.User, "Policy.Admin");
+        if (!result.Succeeded)
         {
-            Navigation.NavigateTo("/policies");
+            Navigation.NavigateTo("/policies", replace: true);
             return;
         }
 

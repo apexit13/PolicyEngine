@@ -7,10 +7,8 @@
 @using PolicyEngineDemo.Shared.Responses
 @using PolicyEngineDemo.Web.Services
 @inject IPolicyService PolicyService
-@inject IRoleService RoleService
 @inject NavigationManager Navigation
 @inject ISnackbar Snackbar
-
 
 <PageTitle>Policies — PolicyEngineDemo</PageTitle>
 
@@ -150,7 +148,8 @@ else
                     (_statusFilter == "Inactive" && !p.IsActive))
         .OrderBy(p => p.Title);
 
-    [CascadingParameter] private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+    [CascadingParameter] 
+    private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -159,7 +158,6 @@ else
             var authState = await AuthenticationStateTask;
             if (authState.User.Identity?.IsAuthenticated == true)
             {
-                //_isAdmin = await RoleService.IsAdminAsync();
                 await LoadAsync();
             }
         }

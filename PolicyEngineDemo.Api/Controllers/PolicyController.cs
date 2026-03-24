@@ -42,6 +42,9 @@ public class PolicyController : ControllerBase
     [Authorize(Policy = "Policy.Admin")]
     public async Task<ActionResult<PolicyResponse>> CreatePolicy(CreatePolicyRequest request)
     {
+        if (!ModelState.IsValid)
+            return ValidationProblem(ModelState);
+
         var policy = await _policyService.CreatePolicyAsync(request);
         return CreatedAtAction(nameof(GetPolicy), new { id = policy!.Id }, policy);
     }
@@ -51,6 +54,9 @@ public class PolicyController : ControllerBase
     [Authorize(Policy = "Policy.Admin")]
     public async Task<ActionResult<PolicyResponse>> UpdatePolicy(Guid id, UpdatePolicyRequest request)
     {
+        if (!ModelState.IsValid)
+            return ValidationProblem(ModelState);
+
         var policy = await _policyService.UpdatePolicyAsync(id, request);
         return policy is null ? NotFound() : Ok(policy);
     }

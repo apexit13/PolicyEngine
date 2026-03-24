@@ -364,8 +364,8 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # Local settings
-appsettings.Development.json
-appsettings.Local.json
+**/appsettings.Development.json
+**/appsettings.Local.json
 
 # Logs
 logs/

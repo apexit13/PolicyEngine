@@ -25,7 +25,7 @@ public class TestUserMiddleware
 
             var claims = new[]
             {
-                new Claim("tenant_id", tenantHeader),
+                new Claim(ClaimNames.TenantId, tenantHeader),
                 new Claim(ClaimTypes.NameIdentifier, "test-user-123"),
 
                 // Must match the namespace used in Program.cs authorization policies

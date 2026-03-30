@@ -2,7 +2,7 @@
 {
     public static class ClaimNames
     {
-        public const string Roles = "https://policyenginedemo.example.com/roles";
-        public const string TenantId = "https://policyenginedemo.example.com/tenant_id";
+        public const string Roles = "https://policyengine.example.com/roles";
+        public const string TenantId = "https://policyengine.example.com/tenant_id";
     }
 }

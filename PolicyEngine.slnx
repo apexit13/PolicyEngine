@@ -1,0 +1,11 @@
+<Solution>
+  <Project Path="PolicyEngine.Api/PolicyEngine.Api.csproj" />
+  <Project Path="PolicyEngine.Core/PolicyEngine.Core.csproj">
+    <BuildDependency Project="PolicyEngine.Shared/PolicyEngine.Shared.csproj" />
+  </Project>
+  <Project Path="PolicyEngine.Shared/PolicyEngine.Shared.csproj" />
+  <Project Path="PolicyEngine.Tests/PolicyEngine.Tests.csproj">
+    <BuildDependency Project="PolicyEngine.Shared/PolicyEngine.Shared.csproj" />
+  </Project>
+  <Project Path="PolicyEngine.Web/PolicyEngine.Web.csproj" />
+</Solution>

@@ -1,0 +1,211 @@
+@page "/policies"
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using MudBlazor
+@using PolicyEngine.Shared.Interfaces
+@using PolicyEngine.Shared.Responses
+@using PolicyEngine.Web.Services
+@inject IPolicyService PolicyService
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<PageTitle>Policies — PolicyEngine</PageTitle>
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-4">
+    <MudText Typo="Typo.h5"><b>Policies</b></MudText>
+    <MudSpacer />
+    <AuthorizeView Policy="Policy.Admin">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.Add"
+                   Href="/policies/new">
+            New Policy
+        </MudButton>
+    </AuthorizeView>
+</MudStack>
+
+<MudPaper Class="pa-4 mb-4" Elevation="1">
+    <MudStack Row="true" Spacing="3" AlignItems="AlignItems.Center">
+        <MudTextField @bind-Value="_search"
+                      Label="Search"
+                      Placeholder="Search title or description…"
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      Variant="Variant.Outlined"
+                      Immediate="true"
+                      Class="flex-grow-1" />
+        <AuthorizeView Policy="Policy.Admin">
+            <MudSelect T="string" @bind-Value="_statusFilter"
+            Label="Status" Variant="Variant.Outlined" Style="min-width:140px">
+                <MudSelectItem Value="@("All")">All</MudSelectItem>
+                <MudSelectItem Value="@("Active")">Active</MudSelectItem>
+                <MudSelectItem Value="@("Inactive")">Inactive</MudSelectItem>
+            </MudSelect>
+        </AuthorizeView>
+    </MudStack>
+</MudPaper>
+
+@if (_loading)
+{
+    <MudProgressLinear Indeterminate="true" Color="Color.Primary" Class="mb-4" />
+}
+else if (_policies.Count == 0)
+{
+    <MudAlert Severity="Severity.Info">No policies found for your tenant.</MudAlert>
+}
+else
+{
+    <MudTable Items="@FilteredPolicies" Hover="true" Striped="true"
+              Elevation="2" Dense="false" T="PolicyResponse">
+        <HeaderContent>
+            <MudTh>Title</MudTh>
+            <MudTh>Description</MudTh>
+            <AuthorizeView Policy="Policy.Admin">   
+                <MudTh>Status</MudTh>
+            </AuthorizeView>
+            <MudTh>Created</MudTh>
+            <AuthorizeView Policy="Policy.Admin">
+                <MudTh>Actions</MudTh>
+            </AuthorizeView>
+        </HeaderContent>
+        <RowTemplate Context="policy">
+            <MudTd DataLabel="Title">
+                <MudText Typo="Typo.body1"><b>@policy.Title</b></MudText>
+            </MudTd>
+            <MudTd DataLabel="Description">
+                <MudText Typo="Typo.body2" Style="max-width:400px;white-space:normal">
+                    @policy.Description
+                </MudText>
+            </MudTd>
+            <AuthorizeView Policy="Policy.Admin">
+                <MudTd DataLabel="Status">
+                    @if (policy.IsActive)
+                    {
+                        <MudChip T="string" Color="Color.Success" Size="Size.Small"
+                        Icon="@Icons.Material.Filled.CheckCircle">
+                            Active
+                        </MudChip>
+                    }
+                    else
+                    {
+                        <MudChip T="string" Color="Color.Default" Size="Size.Small"
+                        Icon="@Icons.Material.Filled.Cancel">
+                            Inactive
+                        </MudChip>
+                    }
+                </MudTd>
+            </AuthorizeView>
+            <MudTd DataLabel="Created">
+                <MudText Typo="Typo.caption">
+                    @policy.CreatedAt.ToString("dd MMM yyyy")
+                </MudText>
+            </MudTd>
+            <AuthorizeView Policy="Policy.Admin">
+                <MudTd DataLabel="Actions">
+                    <MudStack Row="true" Spacing="1">
+                        <MudTooltip Text="Edit">
+                            <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                    Color="Color.Primary" Size="Size.Small"
+                                    Href="@($"/policies/{policy.Id}/edit")"/>
+                        </MudTooltip>
+                        <MudTooltip Text="@(policy.IsActive ? "Deactivate" : "Activate" )">
+                            <MudIconButton
+                                    Icon="@(policy.IsActive
+                                        ? Icons.Material.Filled.ToggleOff
+                                        : Icons.Material.Filled.ToggleOn)"
+                                    Color="@(policy.IsActive ? Color.Warning : Color.Success)"
+                                    Size="Size.Small"
+                                    OnClick="@(() => ToggleAsync(policy))"/>
+                        </MudTooltip>
+                        <MudTooltip Text="Delete">
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                    Color="Color.Error" Size="Size.Small"
+                                    OnClick="@(() => DeleteAsync(policy))"/>
+                        </MudTooltip>
+                    </MudStack>
+                </MudTd>
+            </AuthorizeView>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    private List<PolicyResponse> _policies = [];
+    private bool _loading = true;
+    //private bool _isAdmin = false;
+    private string _search = string.Empty;
+    private string _statusFilter = "All";
+
+    private IEnumerable<PolicyResponse> FilteredPolicies => _policies
+        .Where(p => string.IsNullOrEmpty(_search) ||
+                    p.Title.Contains(_search, StringComparison.OrdinalIgnoreCase) ||
+                    p.Description.Contains(_search, StringComparison.OrdinalIgnoreCase))
+        .Where(p => _statusFilter == "All" ||
+                    (_statusFilter == "Active" && p.IsActive) ||
+                    (_statusFilter == "Inactive" && !p.IsActive))
+        .OrderBy(p => p.Title);
+
+    [CascadingParameter] 
+    private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthenticationStateTask is not null)
+        {
+            var authState = await AuthenticationStateTask;
+            if (authState.User.Identity?.IsAuthenticated == true)
+            {
+                await LoadAsync();
+            }
+        }
+    }
+
+    private async Task LoadAsync()
+    {
+        _loading = true;
+        try
+        {
+            _policies = await PolicyService.GetPoliciesAsync();
+        }
+        catch
+        {
+            Snackbar.Add("Failed to load policies.", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private async Task ToggleAsync(PolicyResponse policy)
+    {
+        try
+        {
+            await PolicyService.ToggleActiveAsync(policy.Id);
+            policy.IsActive = !policy.IsActive;
+            var state = policy.IsActive ? "activated" : "deactivated";
+            Snackbar.Add($"Policy {state}.", Severity.Success);
+        }
+        catch
+        {
+            Snackbar.Add("Failed to update policy.", Severity.Error);
+        }
+    }
+
+    private async Task DeleteAsync(PolicyResponse policy)
+    {
+        try
+        {
+            await PolicyService.DeletePolicyAsync(policy.Id);
+            _policies.Remove(policy);
+            Snackbar.Add("Policy deleted.", Severity.Success);
+        }
+        catch
+        {
+            Snackbar.Add("Failed to delete policy.", Severity.Error);
+        }
+    }
+}

@@ -163,9 +163,6 @@ try
     app.UseRateLimiter();
     app.MapControllers();
 
-    Serilog.Debugging.SelfLog.Enable(msg => File.AppendAllText("logs/serilog-errors.txt", msg));
-
-
     app.Run();
 }
 catch (Exception ex)

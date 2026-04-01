@@ -73,10 +73,8 @@ public class AuditMiddleware
         sw.Stop();
 
         // ── Read user/tenant from claims (available after UseAuthorization) ─
-        var userId = context.User?.FindFirst(
-            System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-        var tenantId = context.User?.FindFirst(
-            ClaimNames.TenantId)?.Value;
+        var userId = context.User?.FindFirst(ClaimNames.UserId)?.Value;
+        var tenantId = context.User?.FindFirst(ClaimNames.TenantId)?.Value;
 
         var statusCode = context.Response.StatusCode;
         var durationMs = sw.ElapsedMilliseconds;
@@ -110,10 +108,11 @@ public class AuditMiddleware
             "AUDIT {Method} {Endpoint} | tenant={TenantId} user={UserId} | {StatusCode} {DurationMs}ms | body={RequestBody}",
             method,
             endpoint,
-            tenantId ?? "anon",
-            userId ?? "anon",
+            tenantId ?? tenantId,
+            userId ?? userId,
             statusCode,
             durationMs,
-            requestBody ?? "-");
+            requestBody ?? requestBody
+);
     }
 }

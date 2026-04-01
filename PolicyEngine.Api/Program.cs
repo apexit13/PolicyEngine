@@ -20,12 +20,12 @@ Log.Logger = new LoggerConfiguration()
 
 try
 {
-
     var builder = WebApplication.CreateBuilder(args);
 
     builder.Host.UseSerilog((context, services, configuration) => configuration
         .ReadFrom.Configuration(context.Configuration)
-        .ReadFrom.Services(services)); // Allows using DI services in sinks/enrichers
+        .ReadFrom.Services(services) // Allows using DI services in sinks/enrichers
+        .Enrich.FromLogContext());
 
     // Prevent .NET from mapping short OIDC claims (like 'sub' or 'tid') 
     // to legacy Microsoft XML namespaces. This ensures our Claims match 
@@ -64,16 +64,16 @@ try
             policy.RequireClaim(ClaimNames.Roles, "Policy.Viewer", "Policy.Admin"));
     });
 
-    // CORS is just implemented for local dev.
-    // For production, Azure configures CORS in front of the API and only allows the Blazor client origin.
+    // ── CORS ──────────────────────────────────────────────────────────
+    var AllowedOrigins = "BlazorClient";
     builder.Services.AddCors(options =>
     {
-        options.AddPolicy("BlazorClient", policy =>
+        options.AddPolicy(AllowedOrigins, policy =>
         {
             policy
                 .WithOrigins(
                     "https://white-bay-09fb46b0f.4.azurestaticapps.net",
-                    "https://localhost:5068",
+                    "http://localhost:5068",
                     "https://localhost:7026")
                 .AllowAnyHeader()
                 .AllowAnyMethod();
@@ -150,19 +150,16 @@ try
         {
             options.WithTitle("Policy Engine API");
         });
-
-        // Azure App Service handles HTTPS termination itself so only needed in Development
-        app.UseHttpsRedirection();
-        app.UseCors("BlazorClient");
     }
 
+    app.UseHttpsRedirection();
+    app.UseCors(AllowedOrigins);
     app.UseSerilogRequestLogging();
     app.UseAuthentication();
     app.UseAuthorization();
     app.UseMiddleware<AuditMiddleware>();
     app.UseRateLimiter();
     app.MapControllers();
-
     app.Run();
 }
 catch (Exception ex)

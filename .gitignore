@@ -370,3 +370,4 @@ FodyWeavers.xsd
 # Logs
 logs/
 *.log
+/PolicyEngine.Api/appsettings.Production.json

@@ -73,6 +73,7 @@ try
             policy
                 .WithOrigins(
                     "https://white-bay-09fb46b0f.4.azurestaticapps.net",
+                    "https://yellow-water-03d781a0f.7.azurestaticapps.net",
                     "http://localhost:5068",
                     "https://localhost:7026")
                 .AllowAnyHeader()

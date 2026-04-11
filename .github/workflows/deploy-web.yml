@@ -1,4 +1,4 @@
-name: Deploy Blazor to Azure Static Web Apps
+name: Deploy PolicyEngine Blazor to Azure Static Web Apps
 
 on:
   push:

@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PolicyEngine.Core\PolicyEngine.Core.csproj" />
+    <ProjectReference Include="..\PolicyEngine.Core\PolicyEngine.Persistence.csproj" />
     <ProjectReference Include="..\PolicyEngine.Shared\PolicyEngine.Shared.csproj" />
   </ItemGroup>
 

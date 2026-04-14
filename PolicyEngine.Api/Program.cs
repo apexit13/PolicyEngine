@@ -6,8 +6,8 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using PolicyEngine.Api.Middleware;
 using PolicyEngine.Api.Services;
-using PolicyEngine.Core.Data;
-using PolicyEngine.Core.Services;
+using PolicyEngine.Persistence.Services;
+using PolicyEngine.Persistence.Data;
 using PolicyEngine.Shared.Constants;
 using PolicyEngine.Shared.Interfaces;
 using Scalar.AspNetCore;
@@ -54,14 +54,14 @@ try
 
     // ── AUTHORIZATION ───────────────────────────────────────────────────────────
     // Maps the custom roles claim injected by the Auth0 Action into ASP.NET Core
-    // roles so [Authorize(Roles = "Policy.Admin")] works out of the box.
+    // roles so [Authorize(Roles = "Admin")] works out of the box.
     builder.Services.AddAuthorization(options =>
     {
-        options.AddPolicy("Policy.Admin", policy =>
-            policy.RequireClaim(ClaimNames.Roles, "Policy.Admin"));
+        options.AddPolicy("Admin", policy =>
+            policy.RequireClaim(ClaimType.Roles, UserRole.Admin));
 
-        options.AddPolicy("Policy.Viewer", policy =>
-            policy.RequireClaim(ClaimNames.Roles, "Policy.Viewer", "Policy.Admin"));
+        options.AddPolicy("Viewer", policy =>
+            policy.RequireClaim(ClaimType.Roles, UserRole.Viewer, UserRole.Admin));
     });
 
     // ── CORS ──────────────────────────────────────────────────────────
@@ -88,7 +88,7 @@ try
         // Default policy — applies to all endpoints
         options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
         {
-            var userId = context.User.FindFirst(ClaimNames.TenantId)?.Value
+            var userId = context.User.FindFirst(ClaimType.TenantId)?.Value
                          ?? context.Connection.RemoteIpAddress?.ToString()
                          ?? "anonymous";
 
@@ -104,7 +104,7 @@ try
         // Stricter policy for write operations
         options.AddPolicy("writes", context =>
         {
-            var userId = context.User.FindFirst(ClaimNames.TenantId)?.Value
+            var userId = context.User.FindFirst(ClaimType.TenantId)?.Value
                          ?? context.Connection.RemoteIpAddress?.ToString()
                          ?? "anonymous";
 

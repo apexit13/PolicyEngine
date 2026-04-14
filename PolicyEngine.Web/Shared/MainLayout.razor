@@ -80,7 +80,7 @@
 
     private string GetTenantDisplay(AuthenticationState authState)
     {
-        var tid = authState.User.FindFirst(ClaimNames.TenantId)?.Value
+        var tid = authState.User.FindFirst(ClaimType.TenantId)?.Value
                ?? "Tenant";
         return tid.Length > 12 ? tid[..12] + "…" : tid;
     }

@@ -17,12 +17,12 @@ namespace PolicyEngine.Web.Services
             if (claimsIdentity == null) return user;
 
             if (account != null
-                && account.AdditionalProperties.TryGetValue(ClaimNames.Roles, out var roles)
+                && account.AdditionalProperties.TryGetValue(ClaimType.Roles, out var roles)
                 && roles is JsonElement roleElement
                 && roleElement.ValueKind == JsonValueKind.Array)
             {
                 // Remove the raw array claim so it doesn't confuse the system
-                var rawClaims = claimsIdentity.FindAll(ClaimNames.Roles).ToList();
+                var rawClaims = claimsIdentity.FindAll(ClaimType.Roles).ToList();
                 foreach (var rc in rawClaims) claimsIdentity.RemoveClaim(rc);
 
                 // Add each role as its own individual claim
@@ -31,7 +31,7 @@ namespace PolicyEngine.Web.Services
                     var roleString = role.GetString();
                     if (!string.IsNullOrEmpty(roleString))
                     {
-                        claimsIdentity.AddClaim(new Claim(ClaimNames.Roles, roleString));
+                        claimsIdentity.AddClaim(new Claim(ClaimType.Roles, roleString));
                     }
                 }
             }

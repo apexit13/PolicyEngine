@@ -1,6 +1,6 @@
 <Solution>
   <Project Path="PolicyEngine.Api/PolicyEngine.Api.csproj" />
-  <Project Path="PolicyEngine.Core/PolicyEngine.Core.csproj">
+  <Project Path="PolicyEngine.Core/PolicyEngine.Persistence.csproj">
     <BuildDependency Project="PolicyEngine.Shared/PolicyEngine.Shared.csproj" />
   </Project>
   <Project Path="PolicyEngine.Shared/PolicyEngine.Shared.csproj" />

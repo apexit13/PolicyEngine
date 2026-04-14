@@ -26,11 +26,11 @@ public class PolicyControllerTests
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, "user-1"),
-            new(ClaimNames.TenantId, tenantId)
+            new(ClaimType.TenantId, tenantId)
         };
 
         if (isAdmin)
-            claims.Add(new Claim(ClaimNames.Roles, "Policy.Admin"));
+            claims.Add(new Claim(ClaimType.Roles, "policy.admin"));
 
         var identity = new ClaimsIdentity(claims, "TestAuth");
         var principal = new ClaimsPrincipal(identity);

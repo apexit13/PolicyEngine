@@ -15,7 +15,7 @@
 <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-4">
     <MudText Typo="Typo.h5"><b>Policies</b></MudText>
     <MudSpacer />
-    <AuthorizeView Policy="Policy.Admin">
+    <AuthorizeView Policy="Admin">
         <MudButton Variant="Variant.Filled" Color="Color.Primary"
                    StartIcon="@Icons.Material.Filled.Add"
                    Href="/policies/new">
@@ -34,7 +34,7 @@
                       Variant="Variant.Outlined"
                       Immediate="true"
                       Class="flex-grow-1" />
-        <AuthorizeView Policy="Policy.Admin">
+        <AuthorizeView Policy="Admin">
             <MudSelect T="string" @bind-Value="_statusFilter"
             Label="Status" Variant="Variant.Outlined" Style="min-width:140px">
                 <MudSelectItem Value="@("All")">All</MudSelectItem>
@@ -60,11 +60,11 @@ else
         <HeaderContent>
             <MudTh>Title</MudTh>
             <MudTh>Description</MudTh>
-            <AuthorizeView Policy="Policy.Admin">   
+            <AuthorizeView Policy="Admin">   
                 <MudTh>Status</MudTh>
             </AuthorizeView>
             <MudTh>Created</MudTh>
-            <AuthorizeView Policy="Policy.Admin">
+            <AuthorizeView Policy="Admin">
                 <MudTh>Actions</MudTh>
             </AuthorizeView>
         </HeaderContent>
@@ -77,7 +77,7 @@ else
                     @policy.Description
                 </MudText>
             </MudTd>
-            <AuthorizeView Policy="Policy.Admin">
+            <AuthorizeView Policy="Admin">
                 <MudTd DataLabel="Status">
                     @if (policy.IsActive)
                     {
@@ -100,7 +100,7 @@ else
                     @policy.CreatedAt.ToString("dd MMM yyyy")
                 </MudText>
             </MudTd>
-            <AuthorizeView Policy="Policy.Admin">
+            <AuthorizeView Policy="Admin">
                 <MudTd DataLabel="Actions">
                     <MudStack Row="true" Spacing="1">
                         <MudTooltip Text="Edit">

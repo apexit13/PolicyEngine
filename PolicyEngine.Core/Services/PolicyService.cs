@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
-using PolicyEngine.Core.Data;
-using PolicyEngine.Core.Models;
+using PolicyEngine.Persistence.Models;
+using PolicyEngine.Persistence.Data;
 using PolicyEngine.Shared.Interfaces;
 using PolicyEngine.Shared.Requests;
 using PolicyEngine.Shared.Responses;
 
-namespace PolicyEngine.Core.Services;
+namespace PolicyEngine.Persistence.Services;
 
 /// <summary>
 /// EF Core implementation of IPolicyService.

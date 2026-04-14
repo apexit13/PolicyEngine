@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Moq;
-using PolicyEngine.Core.Data;
-using PolicyEngine.Core.Models;
-using PolicyEngine.Core.Services;
+using PolicyEngine.Persistence.Models;
+using PolicyEngine.Persistence.Services;
+using PolicyEngine.Persistence.Data;
 using PolicyEngine.Shared.Interfaces;
 
 namespace PolicyEngine.Tests;

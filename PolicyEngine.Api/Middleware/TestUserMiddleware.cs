@@ -16,20 +16,20 @@ public class TestUserMiddleware
         if (!string.IsNullOrEmpty(tenantHeader))
         {
             // X-Role header lets you test both roles in Scalar:
-            //   X-Role: Policy.Admin   → full access
-            //   X-Role: Policy.Viewer  → read only
-            //   (omit)                 → defaults to Policy.Admin for convenience
+            //   X-Role: Admin   → full access
+            //   X-Role: Viewer  → read only
+            //   (omit)                 → defaults to policy.admin for convenience
             var role = context.Request.Headers["X-Role"].ToString();
             if (string.IsNullOrEmpty(role))
-                role = "Policy.Admin";
+                role = UserRole.Admin;
 
             var claims = new[]
             {
-                new Claim(ClaimNames.TenantId, tenantHeader),
+                new Claim(ClaimType.TenantId, tenantHeader),
                 new Claim(ClaimTypes.NameIdentifier, "test-user-123"),
 
                 // Must match the namespace used in Program.cs authorization policies
-                new Claim(ClaimNames.Roles, role)
+                new Claim(ClaimType.Roles, role)
             };
 
             var identity = new ClaimsIdentity(claims, "TestAuth");

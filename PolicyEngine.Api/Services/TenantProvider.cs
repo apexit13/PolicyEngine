@@ -15,7 +15,7 @@ public class TenantProvider : ITenantProvider
 
     // Pulls the 'tenant_id' claim from the JWT
     public string? TenantId() =>
-        _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimNames.TenantId);
+        _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimType.TenantId);
 
     // Pulls the current user's identifier claim from the JWT
     public string? UserId() =>

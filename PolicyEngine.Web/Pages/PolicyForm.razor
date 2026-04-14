@@ -91,7 +91,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateTask!;
-        var result = await AuthorizationService.AuthorizeAsync(authState.User, "Policy.Admin");
+        var result = await AuthorizationService.AuthorizeAsync(authState.User, "Admin");
         if (!result.Succeeded)
         {
             Navigation.NavigateTo("/policies", replace: true);

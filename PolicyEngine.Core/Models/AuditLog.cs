@@ -1,4 +1,4 @@
-namespace PolicyEngine.Core.Models;
+namespace PolicyEngine.Persistence.Models;
 
 public class AuditLog
 {

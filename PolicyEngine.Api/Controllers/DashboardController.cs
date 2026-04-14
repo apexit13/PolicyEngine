@@ -19,7 +19,7 @@ public class DashboardController : ControllerBase
 
     // GET: api/dashboard
     [HttpGet]
-    [Authorize(Policy = "Policy.Viewer")]
+    [Authorize(Policy = "Viewer")]
     public async Task<ActionResult<DashboardResponse>> GetDashboard()
     {
         var dashboard = await _dashboardService.GetDashboardAsync();

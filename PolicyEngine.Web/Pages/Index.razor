@@ -14,7 +14,7 @@
         if (AuthenticationStateTask is null) return;
 
         var authState = await AuthenticationStateTask;
-        var result = await AuthorizationService.AuthorizeAsync(authState.User, "Policy.Admin");
+        var result = await AuthorizationService.AuthorizeAsync(authState.User, "Admin");
 
         Nav.NavigateTo(result.Succeeded ? "/dashboard" : "/policies", replace: true);
     }

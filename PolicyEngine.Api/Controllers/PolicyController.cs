@@ -21,7 +21,7 @@ public class PolicyController : ControllerBase
 
     // GET: api/policy
     [HttpGet]
-    [Authorize(Policy = "Policy.Viewer")]
+    [Authorize(Policy = "Viewer")]
     public async Task<ActionResult<IEnumerable<PolicyResponse>>> GetPolicies()
     {
         var policies = await _policyService.GetPoliciesAsync();
@@ -30,7 +30,7 @@ public class PolicyController : ControllerBase
 
     // GET: api/policy/{id}
     [HttpGet("{id}")]
-    [Authorize(Policy = "Policy.Viewer")]
+    [Authorize(Policy = "Viewer")]
     public async Task<ActionResult<PolicyResponse>> GetPolicy(Guid id)
     {
         var policy = await _policyService.GetPolicyAsync(id);
@@ -39,7 +39,7 @@ public class PolicyController : ControllerBase
 
     // POST: api/policy
     [HttpPost, EnableRateLimiting("writes")]
-    [Authorize(Policy = "Policy.Admin")]
+    [Authorize(Policy = "Admin")]
     public async Task<ActionResult<PolicyResponse>> CreatePolicy(CreatePolicyRequest request)
     {
         if (!ModelState.IsValid)
@@ -51,7 +51,7 @@ public class PolicyController : ControllerBase
 
     // PUT: api/policy/{id}
     [HttpPut("{id}"), EnableRateLimiting("writes")]
-    [Authorize(Policy = "Policy.Admin")]
+    [Authorize(Policy = "Admin")]
     public async Task<ActionResult<PolicyResponse>> UpdatePolicy(Guid id, UpdatePolicyRequest request)
     {
         if (!ModelState.IsValid)
@@ -63,7 +63,7 @@ public class PolicyController : ControllerBase
 
     // PATCH: api/policy/{id}/toggle
     [HttpPatch("{id}/toggle"), EnableRateLimiting("writes")]
-    [Authorize(Policy = "Policy.Admin")]
+    [Authorize(Policy = "Admin")]
     public async Task<IActionResult> ToggleActive(Guid id)
     {
         await _policyService.ToggleActiveAsync(id);
@@ -72,7 +72,7 @@ public class PolicyController : ControllerBase
 
     // DELETE: api/policy/{id}
     [HttpDelete("{id}"), EnableRateLimiting("writes")]
-    [Authorize(Policy = "Policy.Admin")]
+    [Authorize(Policy = "Admin")]
     public async Task<IActionResult> DeletePolicy(Guid id)
     {
         await _policyService.DeletePolicyAsync(id);

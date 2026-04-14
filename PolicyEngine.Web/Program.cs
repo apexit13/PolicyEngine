@@ -34,14 +34,14 @@ builder.Services.AddOidcAuthentication(options =>
 
 // ── AUTHORIZATION ───────────────────────────────────────────────────────────
 // Maps the custom roles claim injected by the Auth0 Action into ASP.NET Core
-// roles so [Authorize(Roles = "Policy.Admin")] works out of the box.
+// roles so [Authorize(Roles = "Admin")] works out of the box.
 builder.Services.AddAuthorizationCore(options =>
 {
-    options.AddPolicy("Policy.Admin", policy =>
-        policy.RequireClaim(ClaimNames.Roles, "Policy.Admin"));
+    options.AddPolicy("Admin", policy =>
+        policy.RequireClaim(ClaimType.Roles, UserRole.Admin));
 
-    options.AddPolicy("Policy.Viewer", policy =>
-        policy.RequireClaim(ClaimNames.Roles, "Policy.Viewer"));
+    options.AddPolicy("Viewer", policy =>
+        policy.RequireClaim(ClaimType.Roles, UserRole.Viewer));
 });
 
 // ── HTTP CLIENT ─────────────────────────────────────────────────────────────

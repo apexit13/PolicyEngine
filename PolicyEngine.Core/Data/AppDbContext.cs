@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using PolicyEngine.Core.Models;
+using PolicyEngine.Persistence.Models;
 using PolicyEngine.Shared.Interfaces;
 
-namespace PolicyEngine.Core.Data;
+namespace PolicyEngine.Persistence.Data;
 
 public class AppDbContext : DbContext
 {

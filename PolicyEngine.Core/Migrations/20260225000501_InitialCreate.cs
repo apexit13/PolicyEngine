@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace PolicyEngine.Shared.Migrations
+namespace PolicyEngine.Persistence.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration

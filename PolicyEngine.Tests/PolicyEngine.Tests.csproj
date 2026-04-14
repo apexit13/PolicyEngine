@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PolicyEngine.Core\PolicyEngine.Core.csproj" />
+    <ProjectReference Include="..\PolicyEngine.Core\PolicyEngine.Persistence.csproj" />
     <ProjectReference Include="..\PolicyEngine.Api\PolicyEngine.Api.csproj" />
   </ItemGroup>
 

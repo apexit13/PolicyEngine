@@ -4,12 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using PolicyEngine.Core.Data;
+using PolicyEngine.Persistence.Data;
 
 
 #nullable disable
 
-namespace PolicyEngine.Shared.Migrations
+namespace PolicyEngine.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     partial class AppDbContextModelSnapshot : ModelSnapshot

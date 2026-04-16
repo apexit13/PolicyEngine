@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication.Internal;
-using PolicyEngine.Shared.Constants;
+using PolicyEngine.Authorization.Constants;
 using System.Security.Claims;
 using System.Text.Json;
 
@@ -16,25 +16,40 @@ namespace PolicyEngine.Web.Services
             var claimsIdentity = user.Identity as ClaimsIdentity;
             if (claimsIdentity == null) return user;
 
-            if (account != null
-                && account.AdditionalProperties.TryGetValue(ClaimType.Roles, out var roles)
-                && roles is JsonElement roleElement
-                && roleElement.ValueKind == JsonValueKind.Array)
+            if (account != null)
             {
-                // Remove the raw array claim so it doesn't confuse the system
-                var rawClaims = claimsIdentity.FindAll(ClaimType.Roles).ToList();
-                foreach (var rc in rawClaims) claimsIdentity.RemoveClaim(rc);
-
-                // Add each role as its own individual claim
-                foreach (var role in roleElement.EnumerateArray())
+                // ── ROLES ────────────────────────────────────────────────────────
+                if (account.AdditionalProperties.TryGetValue(AuthClaimTypes.Roles, out var roles)
+                    && roles is JsonElement roleElement
+                    && roleElement.ValueKind == JsonValueKind.Array)
                 {
-                    var roleString = role.GetString();
-                    if (!string.IsNullOrEmpty(roleString))
+                    var rawClaims = claimsIdentity.FindAll(AuthClaimTypes.Roles).ToList();
+                    foreach (var rc in rawClaims) claimsIdentity.RemoveClaim(rc);
+
+                    foreach (var role in roleElement.EnumerateArray())
                     {
-                        claimsIdentity.AddClaim(new Claim(ClaimType.Roles, roleString));
+                        var roleString = role.GetString();
+                        if (!string.IsNullOrEmpty(roleString))
+                            claimsIdentity.AddClaim(new Claim(AuthClaimTypes.Roles, roleString));
+                    }
+                }
+                // ── PERMISSIONS ────────────────────────────────────────────────────────
+                if (account.AdditionalProperties.TryGetValue(AuthClaimTypes.PermissionsPolicyEngineURI, out var permissions)
+                    && permissions is JsonElement permissionsElement
+                    && permissionsElement.ValueKind == JsonValueKind.Array)
+                {
+                    var rawClaims = claimsIdentity.FindAll(AuthClaimTypes.PermissionsPolicyEngineURI).ToList();
+                    foreach (var rc in rawClaims) claimsIdentity.RemoveClaim(rc);
+
+                    foreach (var permission in permissionsElement.EnumerateArray())
+                    {
+                        var permissionString = permission.GetString();
+                        if (!string.IsNullOrEmpty(permissionString))
+                            claimsIdentity.AddClaim(new Claim(AuthClaimTypes.PermissionsPolicyEngineURI, permissionString));
                     }
                 }
             }
+
             return user;
         }
     }

@@ -22,7 +22,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PolicyEngine.Core\PolicyEngine.Persistence.csproj" />
+    <ProjectReference Include="..\PolicyEngine.Authorization\PolicyEngine.Authorization.csproj" />
+    <ProjectReference Include="..\PolicyEngine.Persistence\PolicyEngine.Persistence.csproj" />
     <ProjectReference Include="..\PolicyEngine.Api\PolicyEngine.Api.csproj" />
   </ItemGroup>
 

@@ -6,9 +6,10 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using PolicyEngine.Api.Middleware;
 using PolicyEngine.Api.Services;
+using PolicyEngine.Authorization.Extensions;
 using PolicyEngine.Persistence.Services;
 using PolicyEngine.Persistence.Data;
-using PolicyEngine.Shared.Constants;
+using PolicyEngine.Authorization.Constants;
 using PolicyEngine.Shared.Interfaces;
 using Scalar.AspNetCore;
 using Serilog;
@@ -48,24 +49,26 @@ try
 
             options.TokenValidationParameters = new TokenValidationParameters
             {
-                NameClaimType = ClaimTypes.NameIdentifier
+                NameClaimType = System.Security.Claims.ClaimTypes.NameIdentifier
             };
         });
 
-    // ── AUTHORIZATION ───────────────────────────────────────────────────────────
-    // Maps the custom roles claim injected by the Auth0 Action into ASP.NET Core
-    // roles so [Authorize(Roles = "Admin")] works out of the box.
-    builder.Services.AddAuthorization(options =>
-    {
-        options.AddPolicy("Admin", policy =>
-            policy.RequireClaim(ClaimType.Roles, UserRole.Admin));
+	// ── AUTHORIZATION ───────────────────────────────────────────────────────────
+	builder.Services.AddPermissionAuthorization();
+	builder.Services.AddAuthorizationCore(options =>
+	{
+		options.AddPolicy("ReadPolicies", policy =>
+	        policy.RequireClaim(AuthClaimTypes.Permissions, Permissions.ReadPolicies));
 
-        options.AddPolicy("Viewer", policy =>
-            policy.RequireClaim(ClaimType.Roles, UserRole.Viewer, UserRole.Admin));
-    });
+		options.AddPolicy("ManagePolicies", policy =>
+			policy.RequireClaim(AuthClaimTypes.Permissions, Permissions.ManagePolicies));
 
-    // ── CORS ──────────────────────────────────────────────────────────
-    var AllowedOrigins = "BlazorClient";
+		options.AddPolicy("ReadDashboard", policy =>
+	        policy.RequireClaim(AuthClaimTypes.Permissions, Permissions.ReadDashboard));
+	});
+
+	// ── CORS ──────────────────────────────────────────────────────────
+	var AllowedOrigins = "BlazorClient";
     builder.Services.AddCors(options =>
     {
         options.AddPolicy(AllowedOrigins, policy =>
@@ -88,7 +91,7 @@ try
         // Default policy — applies to all endpoints
         options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
         {
-            var userId = context.User.FindFirst(ClaimType.TenantId)?.Value
+            var userId = context.User.FindFirst(AuthClaimTypes.TenantId)?.Value
                          ?? context.Connection.RemoteIpAddress?.ToString()
                          ?? "anonymous";
 
@@ -104,7 +107,7 @@ try
         // Stricter policy for write operations
         options.AddPolicy("writes", context =>
         {
-            var userId = context.User.FindFirst(ClaimType.TenantId)?.Value
+            var userId = context.User.FindFirst(AuthClaimTypes.TenantId)?.Value
                          ?? context.Connection.RemoteIpAddress?.ToString()
                          ?? "anonymous";
 

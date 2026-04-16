@@ -2,10 +2,11 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
-using PolicyEngine.Web.Services;
-using PolicyEngine.Shared.Constants;
+using PolicyEngine.Authorization.Constants;
+using PolicyEngine.Authorization.Extensions;
 using PolicyEngine.Shared.Interfaces;
 using PolicyEngine.Web;
+using PolicyEngine.Web.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -20,6 +21,7 @@ builder.Services.AddOidcAuthentication(options =>
     options.ProviderOptions.ClientId = builder.Configuration["Auth0:ClientId"];
 
     var audience = builder.Configuration["Auth0:Audience"];
+
     if (!string.IsNullOrWhiteSpace(audience))
     {
         options.ProviderOptions.AdditionalProviderParameters
@@ -27,21 +29,27 @@ builder.Services.AddOidcAuthentication(options =>
     }
     options.ProviderOptions.ResponseType = "code";
 
+    options.ProviderOptions.DefaultScopes.Clear();
     options.ProviderOptions.DefaultScopes.Add("openid");
     options.ProviderOptions.DefaultScopes.Add("profile");
     options.ProviderOptions.DefaultScopes.Add("email");
 }).AddAccountClaimsPrincipalFactory<ArrayToClaimsPrincipalFactory<RemoteUserAccount>>();
 
 // ── AUTHORIZATION ───────────────────────────────────────────────────────────
-// Maps the custom roles claim injected by the Auth0 Action into ASP.NET Core
-// roles so [Authorize(Roles = "Admin")] works out of the box.
+builder.Services.AddPermissionAuthorization();
 builder.Services.AddAuthorizationCore(options =>
 {
-    options.AddPolicy("Admin", policy =>
-        policy.RequireClaim(ClaimType.Roles, UserRole.Admin));
+    //options.AddPermissionPolicies();
 
-    options.AddPolicy("Viewer", policy =>
-        policy.RequireClaim(ClaimType.Roles, UserRole.Viewer));
+    // Note: Use the full namespace string as the claim type
+    options.AddPolicy("ReadPolicies", policy =>
+        policy.RequireClaim(AuthClaimTypes.PermissionsPolicyEngineURI, Permissions.ReadPolicies));
+
+    options.AddPolicy("ManagePolicies", policy =>
+        policy.RequireClaim(AuthClaimTypes.PermissionsPolicyEngineURI, Permissions.ManagePolicies));
+    
+    options.AddPolicy("ReadDashboard", policy =>
+        policy.RequireClaim(AuthClaimTypes.PermissionsPolicyEngineURI, Permissions.ReadDashboard));
 });
 
 // ── HTTP CLIENT ─────────────────────────────────────────────────────────────

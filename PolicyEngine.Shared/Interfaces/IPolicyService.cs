@@ -5,7 +5,7 @@ namespace PolicyEngine.Shared.Interfaces;
 
 /// <summary>
 /// Shared policy service contract.
-/// API implementation (EF Core): PolicyEngine.Core.Services.PolicyService
+/// API implementation (EF Core): PolicyEngine.Persistence.Services.PolicyService
 /// Web implementation (HttpClient): PolicyEngine.Web.Services.PolicyService
 /// </summary>
 public interface IPolicyService

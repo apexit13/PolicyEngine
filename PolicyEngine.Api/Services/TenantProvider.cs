@@ -1,5 +1,5 @@
 ﻿using System.Security.Claims;
-using PolicyEngine.Shared.Constants;
+using PolicyEngine.Authorization.Constants;
 using PolicyEngine.Shared.Interfaces;
 
 namespace PolicyEngine.Api.Services;
@@ -15,10 +15,10 @@ public class TenantProvider : ITenantProvider
 
     // Pulls the 'tenant_id' claim from the JWT
     public string? TenantId() =>
-        _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimType.TenantId);
+        _httpContextAccessor.HttpContext?.User?.FindFirstValue(AuthClaimTypes.TenantId);
 
     // Pulls the current user's identifier claim from the JWT
     public string? UserId() =>
-        _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+        _httpContextAccessor.HttpContext?.User?.FindFirstValue(AuthClaimTypes.UserId);
 }
 

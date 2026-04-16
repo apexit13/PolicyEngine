@@ -4,7 +4,7 @@
 @using PolicyEngine.Web.Services
 
 <MudNavMenu>
-    <AuthorizeView Policy="Admin">
+    <AuthorizeView Policy="ManagePolicies">
         <MudNavLink Href="/dashboard"
                     Icon="@Icons.Material.Filled.Dashboard">
             Dashboard
@@ -15,7 +15,7 @@
         Policies
     </MudNavLink>
 
-    <AuthorizeView Policy="Admin">
+    <AuthorizeView Policy="ManagePolicies">
         <MudNavLink Href="/policies/new"
                     Icon="@Icons.Material.Filled.AddCircle">
             New Policy

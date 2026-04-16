@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using Microsoft.IO;
-using PolicyEngine.Shared.Constants;
+using PolicyEngine.Authorization.Constants;
 using PolicyEngine.Persistence.Models;
 using PolicyEngine.Persistence.Data;
 
@@ -73,8 +73,8 @@ public class AuditMiddleware
         sw.Stop();
 
         // ── Read user/tenant from claims (available after UseAuthorization) ─
-        var userId = context.User?.FindFirst(ClaimType.UserId)?.Value;
-        var tenantId = context.User?.FindFirst(ClaimType.TenantId)?.Value;
+        var userId = context.User?.FindFirst(AuthClaimTypes.UserId)?.Value;
+        var tenantId = context.User?.FindFirst(AuthClaimTypes.TenantId)?.Value;
 
         var statusCode = context.Response.StatusCode;
         var durationMs = sw.ElapsedMilliseconds;

@@ -1,9 +1,10 @@
 @page "/dashboard"
-@attribute [Authorize(Policy = "Admin")]
+@attribute [Authorize(Policy = @ReadDashboard)]
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using MudBlazor
 @using MudBlazor.Charts
+@using static PolicyEngine.Authorization.Constants.PolicyNames
 @using PolicyEngine.Shared.Responses
 @using PolicyEngine.Shared.Interfaces
 @inject IDashboardService DashboardService

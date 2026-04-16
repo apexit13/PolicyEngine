@@ -26,7 +26,7 @@ namespace PolicyEngine.Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("PolicyEngine.Core.Models.Policy", b =>
+            modelBuilder.Entity("PolicyEngine.Persistence.Models.Policy", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()

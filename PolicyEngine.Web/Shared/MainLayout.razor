@@ -1,8 +1,9 @@
 @inherits LayoutComponentBase
+
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using MudBlazor
-@using PolicyEngine.Shared.Constants
+@using PolicyEngine.Authorization.Constants
 
 <MudThemeProvider Theme="_theme" />
 <MudDialogProvider />
@@ -80,7 +81,7 @@
 
     private string GetTenantDisplay(AuthenticationState authState)
     {
-        var tid = authState.User.FindFirst(ClaimType.TenantId)?.Value
+        var tid = authState.User.FindFirst(AuthClaimTypes.TenantId)?.Value
                ?? "Tenant";
         return tid.Length > 12 ? tid[..12] + "…" : tid;
     }

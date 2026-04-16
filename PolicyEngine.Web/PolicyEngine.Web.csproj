@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PolicyEngine.Authorization\PolicyEngine.Authorization.csproj" />
     <ProjectReference Include="..\PolicyEngine.Shared\PolicyEngine.Shared.csproj" />
   </ItemGroup>
 

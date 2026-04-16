@@ -1,11 +1,17 @@
 <Solution>
-  <Project Path="PolicyEngine.Api/PolicyEngine.Api.csproj" />
-  <Project Path="PolicyEngine.Core/PolicyEngine.Persistence.csproj">
+  <Project Path="PolicyEngine.Api/PolicyEngine.Api.csproj">
+    <BuildDependency Project="PolicyEngine.Authorization/PolicyEngine.Authorization.csproj" />
+  </Project>
+  <Project Path="PolicyEngine.Authorization/PolicyEngine.Authorization.csproj" Id="77d7bcfe-46c2-49be-8d3e-c42fd6e1c9c5" />
+  <Project Path="PolicyEngine.Persistence/PolicyEngine.Persistence.csproj">
     <BuildDependency Project="PolicyEngine.Shared/PolicyEngine.Shared.csproj" />
   </Project>
   <Project Path="PolicyEngine.Shared/PolicyEngine.Shared.csproj" />
   <Project Path="PolicyEngine.Tests/PolicyEngine.Tests.csproj">
+    <BuildDependency Project="PolicyEngine.Authorization/PolicyEngine.Authorization.csproj" />
     <BuildDependency Project="PolicyEngine.Shared/PolicyEngine.Shared.csproj" />
   </Project>
-  <Project Path="PolicyEngine.Web/PolicyEngine.Web.csproj" />
+  <Project Path="PolicyEngine.Web/PolicyEngine.Web.csproj">
+    <BuildDependency Project="PolicyEngine.Authorization/PolicyEngine.Authorization.csproj" />
+  </Project>
 </Solution>

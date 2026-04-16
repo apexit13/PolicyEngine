@@ -2,6 +2,7 @@
 @attribute [Authorize]
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
+@using PolicyEngine.Authorization.Constants
 @inject IAuthorizationService AuthorizationService
 @inject NavigationManager Nav
 
@@ -14,8 +15,8 @@
         if (AuthenticationStateTask is null) return;
 
         var authState = await AuthenticationStateTask;
-        var result = await AuthorizationService.AuthorizeAsync(authState.User, "Admin");
+        var canManagePolicies = (await AuthorizationService.AuthorizeAsync(authState.User, PolicyNames.ManagePolicies)).Succeeded;
 
-        Nav.NavigateTo(result.Succeeded ? "/dashboard" : "/policies", replace: true);
+        Nav.NavigateTo(canManagePolicies ? "/dashboard" : "/policies", replace: true);
     }
 }

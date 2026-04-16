@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using PolicyEngine.Api.Controllers;
-using PolicyEngine.Shared.Constants;
+using PolicyEngine.Authorization.Constants;
 using PolicyEngine.Shared.Interfaces;
 using PolicyEngine.Shared.Requests;
 using PolicyEngine.Shared.Responses;
@@ -25,12 +25,12 @@ public class PolicyControllerTests
     {
         var claims = new List<Claim>
         {
-            new(ClaimTypes.NameIdentifier, "user-1"),
-            new(ClaimType.TenantId, tenantId)
+            new(System.Security.Claims.ClaimTypes.NameIdentifier, "user-1"),
+            new(AuthClaimTypes.TenantId, tenantId)
         };
 
-        if (isAdmin)
-            claims.Add(new Claim(ClaimType.Roles, "policy.admin"));
+        //if (isAdmin)
+        //    claims.Add(new Claim(ClaimTypes.Roles, "policy.admin"));
 
         var identity = new ClaimsIdentity(claims, "TestAuth");
         var principal = new ClaimsPrincipal(identity);

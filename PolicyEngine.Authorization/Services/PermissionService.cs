@@ -18,12 +18,12 @@ namespace PolicyEngine.Authorization.Services
         public IEnumerable<string> GetPermissions(ClaimsPrincipal user)
         {
             if (user == null)
-                return Enumerable.Empty<string>();
+                return [];
 
             var permissionsClaim = user.FindFirst(c => c.Type == AuthClaimTypes.Permissions)?.Value;
 
             if (string.IsNullOrEmpty(permissionsClaim))
-                return Enumerable.Empty<string>();
+                return [];
 
             try
             {
@@ -31,7 +31,7 @@ namespace PolicyEngine.Authorization.Services
             }
             catch (JsonException)
             {
-                return Enumerable.Empty<string>();
+                return [];
             }
         }
     }

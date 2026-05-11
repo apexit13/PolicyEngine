@@ -27,18 +27,7 @@ namespace PolicyEngine.Authorization.Handlers
 
             try
             {
-                string[] permissions;
-
-                // Try to deserialize as array first
-                try
-                {
-                    permissions = JsonSerializer.Deserialize<string[]>(permissionsClaim);
-                }
-                catch (JsonException)
-                {
-                    // If that fails, treat it as a single permission string
-                    permissions = [permissionsClaim];
-                }
+                var permissions = JsonSerializer.Deserialize<string[]>(permissionsClaim) ?? [permissionsClaim];
 
                 if (permissions != null && permissions.Contains(requirement.Permission))
                 {

@@ -38,7 +38,7 @@ public class DashboardControllerTests
         {
             TotalPolicies = 10,
             ActivePolicies = 8,
-            RecentPolicies = new List<PolicyResponse> { new() { Title = "Latest" } }
+            RecentPolicies = [new() { Title = "Latest" }]
         };
 
         var service = new Mock<IDashboardService>();

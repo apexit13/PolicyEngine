@@ -171,5 +171,5 @@ catch (Exception ex)
 }
 finally
 {
-    Log.CloseAndFlush(); // Ensure all logs are written before exit
+    Log.CloseAndFlush();
 }

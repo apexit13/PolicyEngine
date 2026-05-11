@@ -44,8 +44,6 @@ public class DashboardServiceTests
         UserId = "user-1"
     };
 
-    // ── GetDashboardAsync ─────────────────────────────────────────────────────
-
     [Fact]
     public async Task GetDashboardAsync_CalculatesStatistics_Correctly()
     {

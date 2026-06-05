@@ -1,5 +1,6 @@
 @page "/policies/new"
 @page "/policies/{Id:guid}/edit"
+@attribute [Authorize(Policy = "ManagePolicies")]
 @using Microsoft.AspNetCore.Authorization
 @using MudBlazor
 @using PolicyEngine.Shared.Interfaces
@@ -90,13 +91,13 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthenticationStateTask!;
-        var canManagePolicies = (await AuthorizationService.AuthorizeAsync(authState.User, "ManagePolicies")).Succeeded;
-        if (!canManagePolicies)
-        {
-            Navigation.NavigateTo("/policies", replace: true);
-            return;
-        }
+        // var authState = await AuthenticationStateTask!;
+        // var canManagePolicies = (await AuthorizationService.AuthorizeAsync(authState.User, "ManagePolicies")).Succeeded;
+        // if (!canManagePolicies)
+        // {
+        //     Navigation.NavigateTo("/policies", replace: true);
+        //     return;
+        // }
 
         if (!_isNew && Id.HasValue)
         {

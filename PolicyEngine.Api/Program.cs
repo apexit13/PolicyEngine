@@ -68,19 +68,20 @@ try
 	});
 
 	// ── CORS ──────────────────────────────────────────────────────────
-	var AllowedOrigins = "BlazorClient";
+    var frontendUrls = new[]
+    {
+        builder.Configuration["Cors:FrontendUrl"] ?? string.Empty,
+        "http://localhost:5068",
+        "https://localhost:7026"
+    };
+
     builder.Services.AddCors(options =>
     {
-        options.AddPolicy(AllowedOrigins, policy =>
-        {
-            policy
-                .WithOrigins(
-                    "https://yellow-water-03d781a0f.7.azurestaticapps.net",
-                    "http://localhost:5068",
-                    "https://localhost:7026")
-                .AllowAnyHeader()
-                .AllowAnyMethod();
-        });
+        options.AddPolicy("BlazorClient", policy => policy
+            .WithOrigins(frontendUrls)
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials());
     });
 
     // Use rate limiter to protect the API from abuse and prevent noisy neighbors in a multi-tenant environment.
@@ -156,7 +157,7 @@ try
     }
 
     app.UseHttpsRedirection();
-    app.UseCors(AllowedOrigins);
+    app.UseCors("BlazorClient");
     app.UseSerilogRequestLogging();
     app.UseAuthentication();
     app.UseAuthorization();

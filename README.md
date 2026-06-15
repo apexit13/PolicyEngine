@@ -9,7 +9,7 @@ A multi-tenant policy management system. PolicyEngine provides a Blazor WebAssem
 | Frontend | Blazor WebAssembly |
 | Backend | ASP.NET Core 10 Web API |
 | Auth | Auth0 (JWT, RBAC) |
-| Database | Azure SQL (Free Tier) |
+| Database | SQL Server / Azure SQL |
 | Hosting | Azure App Service (F1) + Azure Static Web Apps |
 | CI/CD | GitHub Actions |
 
@@ -111,13 +111,15 @@ Auth0 provides authentication. Two App Roles are enforced at both the API and UI
 | `Policy.Viewer` | Read-only — view active policies for their tenant |
 | Unauthenticated | Redirected to Auth0 login — no API access |
 
-**Multi-tenancy** is implemented via EF Core shadow properties (`TenantId`, `CreatedAt`, `CreatedBy`). The `TenantId` is resolved from the validated JWT `tid` claim — not from an unauthenticated HTTP header — providing cryptographically enforced tenant isolation.
+**Multi-tenancy** is implemented via EF Core shadow properties (`TenantId`, `CreatedAt`, `CreatedBy`). In production, `TenantId` is resolved from the validated JWT `tid` claim — not from an unauthenticated HTTP header — providing cryptographically enforced tenant isolation. In `Development`, `TestUserMiddleware` populates the same claims from `X-Tenant` / `X-Permissions` headers (or configured defaults), so the same authorization and tenant-isolation logic runs without Auth0.
 
 ## Prerequisites
 
 - [.NET SDK 10.0+](https://dotnet.microsoft.com/download)
+- SQL Server (e.g. SQL Server Express, or a connection string to any SQL Server instance)
 - An [Auth0](https://auth0.com) account (free tier)
-- [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) (for deployment)
+
+> Deploying this project yourself also requires the [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) and an Azure subscription — not needed for local development.
 
 ## Getting Started (Local Development)
 
@@ -128,48 +130,55 @@ git clone https://github.com/apexit13/PolicyEngine.git
 cd PolicyEngine
 ```
 
-### 2. Configure Auth0
+### 2. Configure the API project
 
-In the [Auth0 Dashboard](https://manage.auth0.com), create two applications:
-
-- **API** (`PolicyEngine-API`): Register as an API. Set the identifier (audience) to `https://your-tenant.auth0.com/api/v2/`. Create two permissions: `Policy.Admin` and `Policy.Viewer`.
-- **SPA** (`PolicyEngine-Web`): Register as a Single Page Application. Add `https://localhost:5002` to Allowed Callback URLs, Logout URLs, and Web Origins. Assign users the `Policy.Admin` or `Policy.Viewer` role via Auth0 roles.
-
-### 3. Set up app settings
-
-In `PolicyEngine.Api/appsettings.Development.json`:
+Copy `PolicyEngine.Api/appsettings.Development.template.json` to `PolicyEngine.Api/appsettings.Development.json` and fill in your values:
 
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "your-local-or-azure-sql-connection-string"
+    "DefaultConnection": "your-local-sql-connection-string"
   },
   "Auth0": {
     "Domain": "your-tenant.auth0.com",
-    "Audience": "https://your-tenant.auth0.com/api/v2/"
+    "Audience": "your-api-identifier"
   }
 }
 ```
 
-In `PolicyEngine.Web/wwwroot/appsettings.json`:
+This file is gitignored and never committed.
+
+### 3. Configure the Web project
+
+`PolicyEngine.Web/wwwroot/appsettings.json` ships with placeholder values:
 
 ```json
 {
   "Auth0": {
-    "Authority": "https://your-tenant.auth0.com",
-    "ClientId": "your-spa-client-id"
+    "Domain": "your-tenant.auth0.com",
+    "ClientId": "your-spa-client-id",
+    "Audience": "your-api-identifier"
   },
-  "ApiBaseUrl": "https://localhost:5001"
+  "ApiBaseUrl": "https://localhost:7058"
 }
 ```
 
-### 4. Apply database migrations
+Replace `Domain`, `ClientId`, and `Audience` with your own Auth0 application values. `ApiBaseUrl` is overridden for local development by `appsettings.Development.json`, which already points to `https://localhost:7058` — no change needed there.
+
+### 4. Set up Auth0
+
+In the [Auth0 Dashboard](https://manage.auth0.com), create two applications:
+
+- **API** (`PolicyEngine-API`): Register as an API. Set the identifier (audience) to match `Auth0:Audience` above. Create two permissions: `Policy.Admin` and `Policy.Viewer`.
+- **SPA** (`PolicyEngine-Web`): Register as a Single Page Application. Add `https://localhost:7026` to Allowed Callback URLs, Logout URLs, and Web Origins. Assign users the `Policy.Admin` or `Policy.Viewer` role via Auth0 roles.
+
+### 5. Apply database migrations
 
 ```bash
 dotnet ef database update --project PolicyEngine.Persistence --startup-project PolicyEngine.Api
 ```
 
-### 5. Run the application
+### 6. Run the application
 
 ```bash
 # Run the API
@@ -181,12 +190,31 @@ dotnet run --project PolicyEngine.Web
 
 The API will be available at `https://localhost:7058/scalar/v1`. The Blazor app will be at `https://localhost:7026`.
 
-> **Local dev note:** When no `Authorization` header is present, the app falls back to mock claims in `Development` mode, so you can test without Auth0 configured.
+> **Local dev note:** In `Development` mode the API uses `TestUserMiddleware` instead of Auth0 — no token required. Tenant and permissions are controlled via request headers:
+>
+> | Header | Values | Default |
+> |---|---|---|
+> | `X-Tenant` | any string, e.g. `bchydro` | `bchydro` |
+> | `X-Permissions` | `admin`, `viewer` | `admin` |
+>
+> Add these headers when testing endpoints via Scalar at `https://localhost:7058/scalar/v1`.
 
-## Running Tests
+## Testing
+
+Unit tests at both the API and service layers using xUnit, Moq, and EF Core In-Memory database.
+
+- **Controller tests** — Mocked services, verifying HTTP response types and status codes
+- **Service tests** — In-memory database, verifying business logic, data persistence, and tenant isolation via global query filters
+
+Key scenarios tested:
+- CRUD operations return correct responses
+- Tenant isolation — queries never return data from other tenants
+- Dashboard statistics calculate correctly
+- Not-found cases return appropriate status codes without exceptions
 
 ```bash
-dotnet test PolicyEngine.Tests
+# Run all tests
+dotnet test
 ```
 
 ## API Endpoints

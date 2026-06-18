@@ -11,12 +11,12 @@
 
 <MudButton Variant="Variant.Filled" Color="Color.Primary"
            OnClick="CallDebug" Class="mb-4">
-    Call api/policy/debug
+    Call api/policies/debug
 </MudButton>
 
 <MudButton Variant="Variant.Outlined" Color="Color.Secondary"
            OnClick="CallPolicies" Class="mb-4 ml-2">
-    Call api/policy
+    Call api/policies
 </MudButton>
 
 @if (_loading)
@@ -41,7 +41,7 @@
         _result = string.Empty;
         try
         {
-            var response = await Http.GetAsync("api/policy/debug");
+            var response = await Http.GetAsync("api/policies/debug");
             _result = $"Status: {(int)response.StatusCode} {response.StatusCode}\n\n";
             _result += await response.Content.ReadAsStringAsync();
         }
@@ -61,7 +61,7 @@
         _result = string.Empty;
         try
         {
-            var response = await Http.GetAsync("api/policy");
+            var response = await Http.GetAsync("api/policies");
             _result = $"Status: {(int)response.StatusCode} {response.StatusCode}\n\n";
             _result += await response.Content.ReadAsStringAsync();
         }

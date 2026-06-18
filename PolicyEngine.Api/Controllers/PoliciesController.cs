@@ -10,16 +10,16 @@ namespace PolicyEngine.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class PolicyController : ControllerBase
+public class PoliciesController : ControllerBase
 {
     private readonly IPolicyService _policyService;
 
-    public PolicyController(IPolicyService policyService)
+    public PoliciesController(IPolicyService policyService)
     {
         _policyService = policyService;
     }
 
-    // GET: api/policy
+    // GET: api/policies
     [HttpGet]
     [Authorize(Policy = "ReadPolicies")]
     public async Task<ActionResult<IEnumerable<PolicyResponse>>> GetPolicies()
@@ -28,7 +28,7 @@ public class PolicyController : ControllerBase
         return Ok(policies);
     }
 
-    // GET: api/policy/{id}
+    // GET: api/policies/{id}
     [HttpGet("{id}")]
     [Authorize(Policy = "ReadPolicies")]
     public async Task<ActionResult<PolicyResponse>> GetPolicy(Guid id)
@@ -37,7 +37,7 @@ public class PolicyController : ControllerBase
         return policy is null ? NotFound() : Ok(policy);
     }
 
-    // POST: api/policy
+    // POST: api/policies
     [HttpPost, EnableRateLimiting("writes")]
     [Authorize(Policy = "ManagePolicies")]
     public async Task<ActionResult<PolicyResponse>> CreatePolicy(CreatePolicyRequest request)
@@ -49,7 +49,7 @@ public class PolicyController : ControllerBase
         return CreatedAtAction(nameof(GetPolicy), new { id = policy!.Id }, policy);
     }
 
-    // PUT: api/policy/{id}
+    // PUT: api/policies/{id}
     [HttpPut("{id}"), EnableRateLimiting("writes")]
     [Authorize(Policy = "ManagePolicies")]
     public async Task<ActionResult<PolicyResponse>> UpdatePolicy(Guid id, UpdatePolicyRequest request)
@@ -61,7 +61,7 @@ public class PolicyController : ControllerBase
         return policy is null ? NotFound() : Ok(policy);
     }
 
-    // PATCH: api/policy/{id}/toggle
+    // PATCH: api/policies/{id}/toggle
     [HttpPatch("{id}/toggle"), EnableRateLimiting("writes")]
     [Authorize(Policy = "ManagePolicies")]
     public async Task<IActionResult> ToggleActive(Guid id)
@@ -70,7 +70,7 @@ public class PolicyController : ControllerBase
         return Ok();
     }
 
-    // DELETE: api/policy/{id}
+    // DELETE: api/policies/{id}
     [HttpDelete("{id}"), EnableRateLimiting("writes")]
     [Authorize(Policy = "ManagePolicies")]
     public async Task<IActionResult> DeletePolicy(Guid id)

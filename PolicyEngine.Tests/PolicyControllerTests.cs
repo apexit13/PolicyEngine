@@ -14,11 +14,11 @@ namespace PolicyEngine.Tests;
 /// Tests PolicyController HTTP response mapping.
 /// IPolicyService is mocked — business logic is tested in PolicyServiceTests.
 /// </summary>
-public class PolicyControllerTests
+public class PoliciesControllerTests
 {
     // ── Helpers ──────────────────────────────────────────────────────────────
 
-    private static PolicyController CreateController(
+    private static PoliciesController CreateController(
         IPolicyService policyService,
         bool isAdmin = false,
         string tenantId = "tenant-1")
@@ -35,7 +35,7 @@ public class PolicyControllerTests
         var identity = new ClaimsIdentity(claims, "TestAuth");
         var principal = new ClaimsPrincipal(identity);
 
-        return new PolicyController(policyService)
+        return new PoliciesController(policyService)
         {
             ControllerContext = new ControllerContext
             {

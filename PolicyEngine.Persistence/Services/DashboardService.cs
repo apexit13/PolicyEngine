@@ -88,11 +88,11 @@ public class DashboardService : IDashboardService
 
     /// <summary>
     /// Derives a human-readable action label from the HTTP method and endpoint.
-    /// e.g. POST /api/policy       -> "Created"
-    ///      PUT  /api/policy/{id}  -> "Updated"
-    ///      PATCH /api/policy/{id}/toggle -> "Toggled"
-    ///      DELETE /api/policy/{id} -> "Deleted"
-    ///      GET  /api/policy       -> "Viewed"
+    /// e.g. POST /api/policies       -> "Created"
+    ///      PUT  /api/policies/{id}  -> "Updated"
+    ///      PATCH /api/policies/{id}/toggle -> "Toggled"
+    ///      DELETE /api/policies/{id} -> "Deleted"
+    ///      GET  /api/policies       -> "Viewed"
     /// </summary>
     private static string DeriveAction(string method, string endpoint) =>
         method.ToUpperInvariant() switch

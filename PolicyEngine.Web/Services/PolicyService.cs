@@ -21,38 +21,38 @@ public class PolicyService : IPolicyService
 
     public async Task<List<PolicyResponse>> GetPoliciesAsync()
     {
-        return await _http.GetFromJsonAsync<List<PolicyResponse>>("api/policy")
+        return await _http.GetFromJsonAsync<List<PolicyResponse>>("api/policies")
                ?? [];
     }
 
     public async Task<PolicyResponse?> GetPolicyAsync(Guid id)
     {
-        return await _http.GetFromJsonAsync<PolicyResponse>($"api/policy/{id}");
+        return await _http.GetFromJsonAsync<PolicyResponse>($"api/policies/{id}");
     }
 
     public async Task<PolicyResponse?> CreatePolicyAsync(CreatePolicyRequest request)
     {
-        var response = await _http.PostAsJsonAsync("api/policy", request);
+        var response = await _http.PostAsJsonAsync("api/policies", request);
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<PolicyResponse>();
     }
 
     public async Task<PolicyResponse?> UpdatePolicyAsync(Guid id, UpdatePolicyRequest request)
     {
-        var response = await _http.PutAsJsonAsync($"api/policy/{id}", request);
+        var response = await _http.PutAsJsonAsync($"api/policies/{id}", request);
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<PolicyResponse>();
     }
 
     public async Task ToggleActiveAsync(Guid id)
     {
-        var response = await _http.PatchAsync($"api/policy/{id}/toggle", null);
+        var response = await _http.PatchAsync($"api/policies/{id}/toggle", null);
         response.EnsureSuccessStatusCode();
     }
 
     public async Task DeletePolicyAsync(Guid id)
     {
-        var response = await _http.DeleteAsync($"api/policy/{id}");
+        var response = await _http.DeleteAsync($"api/policies/{id}");
         response.EnsureSuccessStatusCode();
     }
 }

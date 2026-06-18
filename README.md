@@ -76,7 +76,7 @@ PolicyEngine/
 ├── PolicyEngine.Persistence/   # EF Core DbContext, repositories, migrations, shadow properties
 ├── PolicyEngine.Shared/        # Shared entities, DTOs, and interfaces
 ├── PolicyEngine.Tests/         # xUnit unit and integration tests
-├── PolicyEngine.Web/           # Blazor WebAssembly frontend — MSAL auth, policy pages
+├── PolicyEngine.Web/           # Blazor WebAssembly frontend — OIDC auth via Auth0, policy pages
 └── .github/workflows/          # GitHub Actions CI/CD pipelines
 ```
 
@@ -88,7 +88,7 @@ PolicyEngine follows a clean three-tier architecture with identity delegated to 
 [Blazor WASM]  →  (Bearer JWT)  →  [ASP.NET Core API]  →  [Azure SQL]
      ↑                                      ↑
   Azure Static                          App Service F1
-  Web Apps (CDN)                    (Microsoft.Identity.Web)
+  Web Apps (CDN)                     (JwtBearer / Auth0)
                         ↑
                       Auth0
                (JWT issuance, App Roles)
@@ -150,20 +150,7 @@ This file is gitignored and never committed.
 
 ### 3. Configure the Web project
 
-`PolicyEngine.Web/wwwroot/appsettings.json` ships with placeholder values:
-
-```json
-{
-  "Auth0": {
-    "Domain": "your-tenant.auth0.com",
-    "ClientId": "your-spa-client-id",
-    "Audience": "your-api-identifier"
-  },
-  "ApiBaseUrl": "https://localhost:7058"
-}
-```
-
-Replace `Domain`, `ClientId`, and `Audience` with your own Auth0 application values. `ApiBaseUrl` is overridden for local development by `appsettings.Development.json`, which already points to `https://localhost:7058` — no change needed there.
+PolicyEngine.Web/wwwroot/appsettings.json contains the Auth0 configuration and production API URL. For local development, appsettings.Development.json automatically overrides ApiBaseUrl to https://localhost:7058 — no changes needed.
 
 ### 4. Set up Auth0
 
@@ -214,13 +201,14 @@ Key scenarios tested:
 
 ```bash
 # Run all tests
-dotnet test
+dotnet test PolicyEngine.Tests
 ```
 
 ## API Endpoints
 
 | Method | Endpoint | Role Required | Description |
 |---|---|---|---|
+| `GET` | `/api/dashboard` | Admin | Get dashboard metrics and recent activity |
 | `GET` | `/api/policies` | Viewer, Admin | List all policies for the authenticated tenant |
 | `GET` | `/api/policies/{id}` | Viewer, Admin | Get a policy by ID |
 | `POST` | `/api/policies` | Admin | Create a new policy |
@@ -233,6 +221,7 @@ dotnet test
 | Route | Access | Description |
 |---|---|---|
 | `/` | Public | Landing page with Auth0 login |
+| `/dashboard` | Admin only | Key policy metrics and recent API activity |
 | `/policies` | Viewer, Admin | Searchable, filterable policy list with status badges |
 | `/policies/new` | Admin only | Create a new policy |
 | `/policies/{id}/edit` | Admin only | Edit an existing policy |

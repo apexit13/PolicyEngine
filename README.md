@@ -24,12 +24,21 @@ The admin dashboard displays key policy metrics and recent activity at a glance.
 
 ---
 
-### Policy List
+### Policies - Admin View
 <p align="center">
   <img src="./.github/screenshots/admin-policies.png" alt="Policy list with status badges and CRUD actions" width="800"/>
 </p>
 
 All policies for the authenticated tenant are displayed with status badges and action buttons. Data is tenant-isolated — users only see policies belonging to their organization.
+
+---
+
+### Policies - Viewer View
+<p align="center">
+  <img src="./.github/screenshots/viewer-policies.png" alt="Read-only policy list with search" width="800"/>
+</p>
+
+All policies for the authenticated tenant are displayed and searchable, but without status badges and action buttons.
 
 ---
 

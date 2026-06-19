@@ -65,7 +65,7 @@ Toggle between active and inactive policies using the status filter. Combined wi
   <img src="./.github/screenshots/create-policy.png" alt="Create new policy form" width="500"/>
 </p>
 
-Admins can create new policies through a simple form. This route is restricted to users with the `ManagePolicies` permission.
+Admins can create new policies through a simple form. This route is restricted to users with the `manage:policies` permission.
 
 ---
 

@@ -83,6 +83,6 @@
     {
         var tid = authState.User.FindFirst(AuthClaimTypes.TenantId)?.Value
                ?? "Tenant";
-        return tid.Length > 12 ? tid[..12] + "…" : tid;
+        return tid.Length > 20 ? tid[..20] + "…" : tid;
     }
 }

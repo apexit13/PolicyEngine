@@ -19,7 +19,7 @@ public class TestUserMiddleware
         // Get tenant from header or use default
         var tenantHeader = context.Request.Headers["X-Tenant"].ToString();
         if (string.IsNullOrEmpty(tenantHeader))
-            tenantHeader = _config["TestUser:DefaultTenant"] ?? "bchydro";
+            tenantHeader = _config["TestUser:DefaultTenant"] ?? "ministry-of-widgets";
 
         // Get permission set from header or use default
         var permissionSet = context.Request.Headers["X-Permissions"].ToString();

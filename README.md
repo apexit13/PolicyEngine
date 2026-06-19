@@ -325,12 +325,12 @@ The API will be available at `https://localhost:7058/scalar/v1`.
 The Blazor app will be at `https://localhost:7026`.
 
 > **Local dev note:** In `Development` mode the API uses `TestUserMiddleware` instead of Auth0 — no token required. Tenant and permissions are controlled via request headers:
->
-> | Header          | Values                     | Default   |
+
+| Header          | Values                     | Default   |
 | --------------- | -------------------------- | --------- |
 | `X-Permissions` | `admin`, `viewer`          | `admin`   |
 | `X-Tenant`      | `coastal-authority` or `ministry-of-widgets` | `ministry-of-widgets` |
->
+
 > Add these headers when testing endpoints via Scalar at `https://localhost:7058/scalar/v1`.
 
 ## Testing

@@ -217,21 +217,7 @@ Valid tenant IDs:
 
 ### 5. Configure Auth0 Post-Login Action
 
-**Step 1 — Create a Machine-to-Machine application**
-
-Register a Machine-to-Machine (M2M) application in Auth0 — this is separate from the SPA application. Then grant it the required Management API permissions:
-
-1. Go to your M2M application → **API Access**
-2. Click **Edit** under **Auth0 Management API**
-3. Click **Client Access** and enable the following permissions:
-
-| Permission |
-|---|
-| `read:users` |
-| `read:roles` |
-| `read:user_effective_permissions` |
-
-**Step 2 — Create the action**
+**Step 1 — Create the action**
 
 1. In the Auth0 Dashboard go to **Actions → Library -> Create Action** and click **Create Custom Action**. Name it (e.g. `PolicyEngine Post Login`), select **Login / Post Login** as the trigger, and click **Create**.
 
@@ -278,8 +264,8 @@ exports.onExecutePostLogin = async (event, api) => {
 | Secret | Value |
 |---|---|
 | `AUTH0_DOMAIN` | Your Auth0 domain |
-| `AUTH0_CLIENT_ID` | Your M2M application Client ID |
-| `AUTH0_CLIENT_SECRET` | Your M2M application Client Secret |
+| `AUTH0_CLIENT_ID` | Your Auth0 API Explorer Application Client ID |
+| `AUTH0_CLIENT_SECRET` | Your Auth0 API Explorer Application Client Secret |
 
 4. Add the following dependency to the action:
 
@@ -289,7 +275,7 @@ exports.onExecutePostLogin = async (event, api) => {
 
 5.  Click **Deploy** to save the action.
 
-**Step 3 — Add the action to the Login flow**
+**Step 2 — Add the action to the Login flow**
 
 Go to **Actions → Triggers → post-login**, drag the **PolicyEngine Post Login** action into the flow between **Start** and **Complete**, and click **Apply**.
 
